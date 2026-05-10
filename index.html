@@ -3,306 +3,240 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jeu de la Complicité</title>
+<title>Complicité</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0e0e0f;
-  --surface: #1a1a1c;
-  --surface2: #242426;
-  --border: rgba(255,255,255,0.08);
-  --accent: #f0e040;
-  --accent2: #ff6b35;
-  --text: #f5f5f0;
-  --muted: rgba(245,245,240,0.45);
+  --bg: #080810;
+  --surface: #13131e;
+  --surface2: #1c1c2e;
+  --surface3: #242438;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --accent: #c8f135;
+  --accent-dim: rgba(200,241,53,0.12);
+  --accent2: #7c6af7;
+  --text: #f0f0ee;
+  --muted: rgba(240,240,238,0.4);
+  --muted2: rgba(240,240,238,0.22);
   --success: #4ade80;
   --danger: #f87171;
-  --radius: 14px;
+  --r: 14px;
+  --r-lg: 20px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-}
-.app {
-  width: 100%;
-  max-width: 560px;
-  padding: 2rem 1.25rem 4rem;
-  min-height: 100vh;
-}
-.logo {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 2.5rem;
-}
-h1 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: clamp(28px, 6vw, 40px);
-  line-height: 1.1;
-  margin-bottom: 0.5rem;
-}
-h2 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 20px;
-  margin-bottom: 1rem;
-}
-p { font-size: 15px; color: var(--muted); line-height: 1.6; }
-.screen { display: none; }
-.screen.active { display: block; }
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);}
+body{font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh;}
 
-input[type="text"] {
-  width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
-  font-size: 15px;
-  font-family: 'DM Sans', sans-serif;
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.15s;
-}
-input[type="text"]:focus { border-color: var(--accent); }
-input[type="text"]::placeholder { color: var(--muted); }
+/* noise overlay */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");opacity:.4;pointer-events:none;z-index:0;}
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0.75rem 1.25rem;
-  border-radius: 10px;
-  font-size: 15px;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: none;
-}
-.btn-primary {
-  background: var(--accent);
-  color: #0e0e0f;
-  width: 100%;
-}
-.btn-primary:hover { background: #ffe800; transform: translateY(-1px); }
-.btn-primary:active { transform: translateY(0); }
-.btn-secondary {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  flex: 1;
-}
-.btn-secondary:hover { background: var(--surface2); }
-.btn-ghost {
-  background: transparent;
-  color: var(--muted);
-  border: 1px solid var(--border);
-  flex: 1;
-}
-.btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+.app{position:relative;z-index:1;width:100%;max-width:580px;margin:0 auto;padding:2rem 1.25rem 5rem;}
 
-.btn-add {
-  background: var(--surface2);
-  color: var(--accent);
-  border: 1px solid rgba(240,224,64,0.2);
-  padding: 0.75rem 1rem;
-  white-space: nowrap;
-}
-.btn-add:hover { background: rgba(240,224,64,0.1); }
+/* glow blobs */
+.blob{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;}
+.blob-1{width:400px;height:400px;background:rgba(124,106,247,0.08);top:-100px;right:-100px;}
+.blob-2{width:300px;height:300px;background:rgba(200,241,53,0.05);bottom:0;left:-80px;}
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  margin-bottom: 0.5rem;
-}
-.error-msg {
-  font-size: 13px;
-  color: var(--danger);
-  margin: 0.5rem 0;
-  display: none;
-}
-.badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-.badge-category {
-  background: rgba(240,224,64,0.12);
-  color: var(--accent);
-  border: 1px solid rgba(240,224,64,0.2);
-}
+.screen{display:none;}
+.screen.active{display:block;animation:fadeUp .25s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-.scores-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 1.25rem;
-  flex-wrap: wrap;
+/* logo */
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:2.5rem;}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(32px,7vw,48px);line-height:1.05;color:var(--text);}
+h1 em{font-style:normal;color:var(--accent);}
+h2{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:var(--text);}
+p{font-size:15px;color:var(--muted);line-height:1.65;}
+
+/* inputs */
+input[type=text]{
+  width:100%;background:var(--surface2);border:1px solid var(--border2);
+  border-radius:12px;padding:.8rem 1rem;font-size:15px;
+  font-family:'DM Sans',sans-serif;color:var(--text);outline:none;
+  transition:border-color .2s,box-shadow .2s;
 }
-.score-chip {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.5rem 0.875rem;
-  text-align: center;
-  flex: 1;
-  min-width: 80px;
-  transition: all 0.2s;
+input[type=text]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,241,53,.1);}
+input[type=text]::placeholder{color:var(--muted2);}
+
+/* buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:.8rem 1.25rem;border-radius:12px;font-size:15px;
+  font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;
+  border:none;transition:all .15s;
 }
-.score-chip.active {
-  background: rgba(240,224,64,0.1);
-  border-color: rgba(240,224,64,0.4);
+.btn-primary{
+  background:var(--accent);color:#080810;width:100%;font-weight:700;
+  letter-spacing:.01em;
 }
-.score-chip .num {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 22px;
-  color: var(--text);
+.btn-primary:hover{background:#d8ff40;transform:translateY(-1px);box-shadow:0 6px 24px rgba(200,241,53,.18);}
+.btn-primary:active{transform:translateY(0);}
+
+.btn-secondary{
+  background:var(--surface2);color:var(--text);
+  border:1px solid var(--border2);flex:1;
 }
-.score-chip.active .num { color: var(--accent); }
-.score-chip .lbl {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 1px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 90px;
+.btn-secondary:hover{background:var(--surface3);border-color:rgba(255,255,255,.2);}
+
+.btn-ghost{
+  background:transparent;color:var(--muted);
+  border:1px solid var(--border);flex:1;
+}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+
+.btn-icon{
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--accent);padding:.8rem 1rem;white-space:nowrap;
+}
+.btn-icon:hover{background:var(--accent-dim);border-color:rgba(200,241,53,.3);}
+
+/* cards */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:1rem 1.25rem;margin-bottom:.5rem;
+}
+.section-label{
+  font-size:11px;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted2);margin-bottom:.625rem;
+}
+.error-msg{font-size:13px;color:var(--danger);margin:.5rem 0;display:none;}
+.divider{height:1px;background:var(--border);margin:1.5rem 0;}
+
+/* scores */
+.scores-wrap{
+  display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap;
+  padding:.75rem;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);
+}
+.score-chip{
+  flex:1;min-width:70px;text-align:center;padding:.5rem .5rem .4rem;
+  border-radius:10px;transition:all .2s;
+}
+.score-chip.active{background:var(--accent-dim);}
+.score-chip .num{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:24px;
+  color:var(--muted);transition:color .2s;
+}
+.score-chip.active .num{color:var(--accent);}
+.score-chip .lbl{
+  font-size:11px;color:var(--muted2);margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;
+  margin:0 auto;
+}
+.score-chip.active .lbl{color:rgba(200,241,53,.5);}
+
+/* turn info */
+.turn-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:100px;padding:.45rem 1rem;font-size:14px;
+  color:var(--muted);margin-bottom:1.25rem;
+}
+.turn-pill strong{color:var(--accent);font-weight:500;}
+.turn-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.75);}}
+
+/* word stage */
+.word-stage{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:24px;padding:3rem 1.5rem 2.5rem;
+  text-align:center;margin:0 0 1.25rem;
+  position:relative;overflow:hidden;
+}
+.word-stage::after{
+  content:'';position:absolute;bottom:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,106,247,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.word-counter{
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted2);margin-bottom:1.25rem;
+}
+.word-main{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(28px,7vw,46px);color:var(--text);
+  line-height:1.1;margin-bottom:.875rem;
+  transition:all .2s;
+}
+.word-cat{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--accent-dim);border:1px solid rgba(200,241,53,.2);
+  border-radius:100px;padding:.3rem .875rem;
+  font-size:12px;font-weight:500;color:var(--accent);letter-spacing:.04em;
 }
 
-.word-stage {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 2.5rem 1.5rem;
-  text-align: center;
-  margin: 1.25rem 0;
-  position: relative;
-  overflow: hidden;
+/* buzz */
+.buzz-section p{font-size:13px;color:var(--muted2);margin-bottom:.625rem;}
+.buzz-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:8px;margin-bottom:.75rem;
 }
-.word-stage::before {
-  content: '';
-  position: absolute;
-  top: -40px; left: -40px;
-  width: 150px; height: 150px;
-  background: radial-gradient(circle, rgba(240,224,64,0.06) 0%, transparent 70%);
-  pointer-events: none;
+.buzz-btn{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:14px;padding:.875rem .75rem;cursor:pointer;
+  color:var(--text);font-family:'DM Sans',sans-serif;text-align:center;
+  transition:all .15s;
 }
-.word-main {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: clamp(26px, 7vw, 42px);
-  color: var(--text);
-  margin-bottom: 0.5rem;
-  line-height: 1.15;
-}
-.word-cat { font-size: 13px; color: var(--muted); }
+.buzz-btn:hover{background:var(--surface3);border-color:rgba(255,255,255,.22);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.buzz-btn:active{transform:translateY(0);}
+.buzz-btn.is-active{background:var(--accent-dim);border-color:rgba(200,241,53,.35);}
+.buzz-btn .bname{font-weight:500;font-size:14px;}
+.buzz-btn .bplayers{font-size:12px;color:var(--muted);margin-top:3px;}
+.buzz-btn.is-active .bname{color:var(--accent);}
+.buzz-btn.is-active .bplayers{color:rgba(200,241,53,.5);}
 
-.turn-info {
-  font-size: 14px;
-  color: var(--muted);
-  margin-bottom: 1rem;
-  padding: 0.625rem 1rem;
-  background: var(--surface);
-  border-radius: 10px;
-  border: 1px solid var(--border);
+/* result */
+.result-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:2rem 1.5rem;
+  text-align:center;margin:.5rem 0 1.25rem;
 }
-.turn-info strong { color: var(--accent); font-weight: 500; }
+.result-card .emoji{font-size:44px;margin-bottom:.875rem;display:block;}
+.result-card .msg{font-size:16px;color:var(--text);line-height:1.5;}
+.result-card .word-recap{
+  margin-top:.875rem;font-size:13px;color:var(--muted);
+}
+.result-card .word-recap span{color:var(--text);font-weight:500;}
 
-.buzz-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 8px;
-  margin: 1rem 0;
-}
-.buzz-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0.875rem 0.75rem;
-  cursor: pointer;
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  text-align: center;
-  transition: all 0.15s;
-}
-.buzz-btn:hover { background: var(--surface2); border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
-.buzz-btn.is-active { background: rgba(240,224,64,0.1); border-color: rgba(240,224,64,0.4); }
-.buzz-btn .bname { font-weight: 500; font-size: 14px; }
-.buzz-btn .bplayers { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-.result-box {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  text-align: center;
-  border: 1px solid var(--border);
-  margin: 1rem 0;
-}
-.result-box .big { font-size: 32px; margin-bottom: 0.5rem; }
-.result-box p { font-size: 15px; color: var(--text); }
-
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin: 1.25rem 0;
-}
-.btn-row { display: flex; gap: 8px; }
-.section-label {
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  margin-bottom: 0.625rem;
-}
+.btn-row{display:flex;gap:8px;}
 </style>
 </head>
 <body>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
 <div class="app">
-  <div class="logo">🎯 Complicité</div>
+  <div class="logo">
+    <div class="logo-icon">🎯</div>
+    <span class="logo-text">Complicité</span>
+  </div>
 
   <!-- SETUP -->
   <div id="screen-setup" class="screen active">
-    <h1>Le jeu de la<br><span style="color:var(--accent)">complicité</span></h1>
-    <p style="margin:0.75rem 0 2rem">Faites deviner des mots à votre partenaire grâce à vos expériences communes.</p>
-
+    <h1 style="margin-bottom:.75rem">Le jeu de<br>la <em>complicité</em></h1>
+    <p style="margin-bottom:2rem">Faites deviner des mots à votre partenaire grâce à vos expériences communes. Les autres équipes peuvent voler le point.</p>
     <div class="section-label">Équipes</div>
     <div id="teams-list"></div>
-
-    <div style="display:flex;gap:8px;margin-bottom:0.5rem">
+    <div style="display:flex;gap:8px;margin-bottom:.375rem">
       <input type="text" id="inp-team" placeholder="Nom de l'équipe…" />
-      <button class="btn btn-add" onclick="addTeam()">+ Ajouter</button>
+      <button class="btn btn-icon" onclick="addTeam()">+ Ajouter</button>
     </div>
     <div class="error-msg" id="err-setup"></div>
-
     <div class="divider"></div>
     <button class="btn btn-primary" onclick="startGame()">Lancer la partie →</button>
   </div>
 
   <!-- PLAYERS -->
   <div id="screen-players" class="screen">
-    <p style="margin-bottom:0.375rem;font-size:13px;color:var(--muted)">Équipe</p>
-    <h2 id="players-team-name" style="margin-bottom:1.5rem"></h2>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:0.5rem">
+    <p style="font-size:13px;color:var(--muted2);margin-bottom:.25rem">Configuration équipe</p>
+    <h2 id="players-team-name" style="margin-bottom:1.5rem;font-size:24px"></h2>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:.375rem">
       <input type="text" id="inp-p1" placeholder="Prénom joueur 1" />
       <input type="text" id="inp-p2" placeholder="Prénom joueur 2" />
     </div>
@@ -313,29 +247,32 @@ input[type="text"]::placeholder { color: var(--muted); }
 
   <!-- GAME -->
   <div id="screen-game" class="screen">
-    <div class="scores-row" id="scores-row"></div>
-
-    <div class="turn-info" id="turn-info"></div>
-
-    <div class="word-stage" id="word-stage">
+    <div class="scores-wrap" id="scores-wrap"></div>
+    <div class="turn-pill">
+      <span class="turn-dot"></span>
+      <span id="turn-info"></span>
+    </div>
+    <div class="word-stage">
+      <div class="word-counter" id="word-counter"></div>
       <div class="word-main" id="word-main">—</div>
-      <div class="word-cat" id="word-cat"></div>
+      <div id="word-cat"></div>
     </div>
 
-    <!-- Phase : deviner -->
     <div id="phase-guess">
-      <p style="margin-bottom:0.75rem;font-size:14px">Qui a deviné le mot ?</p>
-      <div class="buzz-grid" id="buzz-grid"></div>
+      <div class="buzz-section">
+        <p>Qui a deviné le mot ?</p>
+        <div class="buzz-grid" id="buzz-grid"></div>
+      </div>
       <div class="btn-row">
-        <button class="btn btn-ghost" onclick="skipWord()">Passer ce mot</button>
+        <button class="btn btn-ghost" onclick="skipWord()">⟳ Passer ce mot</button>
       </div>
     </div>
 
-    <!-- Phase : résultat -->
     <div id="phase-result" style="display:none">
-      <div class="result-box">
-        <div class="big" id="result-emoji"></div>
-        <p id="result-msg"></p>
+      <div class="result-card">
+        <span class="emoji" id="result-emoji"></span>
+        <div class="msg" id="result-msg"></div>
+        <div class="word-recap">Mot : <span id="recap-word"></span></div>
       </div>
       <button class="btn btn-primary" onclick="nextTurn()">Tour suivant →</button>
     </div>
@@ -344,641 +281,591 @@ input[type="text"]::placeholder { color: var(--muted); }
 
 <script>
 const WORDS = [
-  {mot:"Nutella",cat:"Marque"},
-  {mot:"Le Roi Lion",cat:"Film"},
-  {mot:"Pokémon",cat:"Série / Jeu"},
-  {mot:"Harry Potter",cat:"Livre / Film"},
-  {mot:"iPhone",cat:"Produit"},
-  {mot:"McDonalds",cat:"Marque"},
-  {mot:"IKEA",cat:"Marque"},
-  {mot:"Netflix",cat:"Service"},
-  {mot:"Minecraft",cat:"Jeu vidéo"},
-  {mot:"Fortnite",cat:"Jeu vidéo"},
-  {mot:"TikTok",cat:"Réseau social"},
-  {mot:"Beyoncé",cat:"Célébrité"},
-  {mot:"Eiffel Tower",cat:"Lieu"},
-  {mot:"Disneyland",cat:"Lieu"},
-  {mot:"Airbus",cat:"Marque"},
-  {mot:"Croissant",cat:"Nourriture"},
-  {mot:"Sushi",cat:"Nourriture"},
-  {mot:"Pizza",cat:"Nourriture"},
-  {mot:"Ramen",cat:"Nourriture"},
-  {mot:"Tiramisu",cat:"Nourriture"},
-  {mot:"Hamburger",cat:"Nourriture"},
-  {mot:"Tacos",cat:"Nourriture"},
-  {mot:"Chocolat chaud",cat:"Boisson"},
-  {mot:"Starbucks",cat:"Marque"},
-  {mot:"Coca-Cola",cat:"Boisson"},
-  {mot:"Red Bull",cat:"Boisson"},
-  {mot:"Inception",cat:"Film"},
-  {mot:"Interstellar",cat:"Film"},
-  {mot:"Titanic",cat:"Film"},
-  {mot:"Pulp Fiction",cat:"Film"},
-  {mot:"Parasite",cat:"Film"},
-  {mot:"Avatar",cat:"Film"},
-  {mot:"Spider-Man",cat:"Personnage"},
-  {mot:"Batman",cat:"Personnage"},
-  {mot:"Iron Man",cat:"Personnage"},
-  {mot:"Hermione Granger",cat:"Personnage"},
-  {mot:"Sherlock Holmes",cat:"Personnage"},
-  {mot:"James Bond",cat:"Personnage"},
-  {mot:"Shrek",cat:"Personnage"},
-  {mot:"Pikachu",cat:"Personnage"},
-  {mot:"Mickey Mouse",cat:"Personnage"},
-  {mot:"Darth Vader",cat:"Personnage"},
-  {mot:"The Office",cat:"Série"},
-  {mot:"Breaking Bad",cat:"Série"},
-  {mot:"Game of Thrones",cat:"Série"},
-  {mot:"Stranger Things",cat:"Série"},
-  {mot:"La Casa de Papel",cat:"Série"},
-  {mot:"Friends",cat:"Série"},
-  {mot:"Squid Game",cat:"Série"},
-  {mot:"Peaky Blinders",cat:"Série"},
-  {mot:"Black Mirror",cat:"Série"},
-  {mot:"Narcos",cat:"Série"},
-  {mot:"Euphoria",cat:"Série"},
-  {mot:"The Last of Us",cat:"Jeu vidéo"},
-  {mot:"GTA V",cat:"Jeu vidéo"},
-  {mot:"FIFA",cat:"Jeu vidéo"},
-  {mot:"Call of Duty",cat:"Jeu vidéo"},
-  {mot:"League of Legends",cat:"Jeu vidéo"},
-  {mot:"Among Us",cat:"Jeu vidéo"},
-  {mot:"Super Mario",cat:"Jeu vidéo"},
-  {mot:"Tetris",cat:"Jeu vidéo"},
-  {mot:"Rollercoaster",cat:"Objet / Lieu"},
-  {mot:"Planche de surf",cat:"Objet"},
-  {mot:"Télescope",cat:"Objet"},
-  {mot:"Escalier roulant",cat:"Objet"},
-  {mot:"Distributeur automatique",cat:"Objet"},
-  {mot:"Casque VR",cat:"Objet"},
-  {mot:"Drone",cat:"Objet"},
-  {mot:"Parachute",cat:"Objet"},
-  {mot:"Igloo",cat:"Construction"},
-  {mot:"Gratte-ciel",cat:"Construction"},
-  {mot:"Arc-en-ciel",cat:"Nature"},
-  {mot:"Aurore boréale",cat:"Nature"},
-  {mot:"Volcan",cat:"Nature"},
-  {mot:"Iceberg",cat:"Nature"},
-  {mot:"Désert du Sahara",cat:"Lieu"},
-  {mot:"Amazonie",cat:"Lieu"},
-  {mot:"Vegas",cat:"Lieu"},
-  {mot:"Tokyo",cat:"Lieu"},
-  {mot:"New York",cat:"Lieu"},
-  {mot:"Barcelone",cat:"Lieu"},
-  {mot:"Ibiza",cat:"Lieu"},
-  {mot:"Bali",cat:"Lieu"},
-  {mot:"Dubai",cat:"Lieu"},
-  {mot:"Champs-Élysées",cat:"Lieu"},
-  {mot:"Mona Lisa",cat:"Œuvre"},
-  {mot:"Joconde",cat:"Œuvre"},
-  {mot:"Guernica",cat:"Œuvre"},
-  {mot:"Beethoven",cat:"Célébrité"},
-  {mot:"Mozart",cat:"Célébrité"},
-  {mot:"Michael Jackson",cat:"Célébrité"},
-  {mot:"Elvis Presley",cat:"Célébrité"},
-  {mot:"David Bowie",cat:"Célébrité"},
-  {mot:"Daft Punk",cat:"Groupe"},
-  {mot:"The Beatles",cat:"Groupe"},
-  {mot:"Eminem",cat:"Célébrité"},
-  {mot:"Kanye West",cat:"Célébrité"},
-  {mot:"Drake",cat:"Célébrité"},
-  {mot:"Taylor Swift",cat:"Célébrité"},
-  {mot:"Rihanna",cat:"Célébrité"},
-  {mot:"Stromae",cat:"Célébrité"},
-  {mot:"Jul",cat:"Célébrité"},
-  {mot:"Booba",cat:"Célébrité"},
-  {mot:"Maître Gims",cat:"Célébrité"},
-  {mot:"PNL",cat:"Groupe"},
-  {mot:"Orelsan",cat:"Célébrité"},
-  {mot:"Aya Nakamura",cat:"Célébrité"},
-  {mot:"Ninho",cat:"Célébrité"},
-  {mot:"Cristiano Ronaldo",cat:"Célébrité"},
-  {mot:"Lionel Messi",cat:"Célébrité"},
-  {mot:"Kylian Mbappé",cat:"Célébrité"},
-  {mot:"LeBron James",cat:"Célébrité"},
-  {mot:"Neymar",cat:"Célébrité"},
-  {mot:"Zlatan Ibrahimović",cat:"Célébrité"},
-  {mot:"Serena Williams",cat:"Célébrité"},
-  {mot:"Roger Federer",cat:"Célébrité"},
-  {mot:"Usain Bolt",cat:"Célébrité"},
-  {mot:"Michael Jordan",cat:"Célébrité"},
-  {mot:"Karim Benzema",cat:"Célébrité"},
-  {mot:"Tour de France",cat:"Événement"},
-  {mot:"Jeux Olympiques",cat:"Événement"},
-  {mot:"Coupe du Monde",cat:"Événement"},
-  {mot:"Roland-Garros",cat:"Événement"},
-  {mot:"Festival de Cannes",cat:"Événement"},
-  {mot:"Halloween",cat:"Fête"},
-  {mot:"Carnaval",cat:"Fête"},
-  {mot:"Nouvel An",cat:"Fête"},
-  {mot:"Saint-Valentin",cat:"Fête"},
-  {mot:"Black Friday",cat:"Événement"},
-  {mot:"Bouchon d'oreilles",cat:"Objet"},
-  {mot:"Post-it",cat:"Objet"},
-  {mot:"Scotch",cat:"Objet"},
-  {mot:"Trombone",cat:"Objet"},
-  {mot:"Stylo bille",cat:"Objet"},
-  {mot:"Règle",cat:"Objet"},
-  {mot:"Agrafeuse",cat:"Objet"},
-  {mot:"Souris d'ordinateur",cat:"Objet"},
-  {mot:"Clavier mécanique",cat:"Objet"},
-  {mot:"Webcam",cat:"Objet"},
-  {mot:"Chargeur USB-C",cat:"Objet"},
-  {mot:"AirPods",cat:"Produit"},
-  {mot:"Apple Watch",cat:"Produit"},
-  {mot:"PS5",cat:"Produit"},
-  {mot:"Nintendo Switch",cat:"Produit"},
-  {mot:"Tesla",cat:"Marque"},
-  {mot:"Ferrari",cat:"Marque"},
-  {mot:"Lamborghini",cat:"Marque"},
-  {mot:"Porsche",cat:"Marque"},
-  {mot:"Rolls-Royce",cat:"Marque"},
-  {mot:"Snapchat",cat:"Réseau social"},
-  {mot:"Instagram",cat:"Réseau social"},
-  {mot:"Twitter / X",cat:"Réseau social"},
-  {mot:"LinkedIn",cat:"Réseau social"},
-  {mot:"Reddit",cat:"Réseau social"},
-  {mot:"YouTube",cat:"Plateforme"},
-  {mot:"Twitch",cat:"Plateforme"},
-  {mot:"Spotify",cat:"Plateforme"},
-  {mot:"Amazon",cat:"Plateforme"},
-  {mot:"Uber",cat:"Service"},
-  {mot:"Airbnb",cat:"Service"},
-  {mot:"Deliveroo",cat:"Service"},
-  {mot:"Leboncoin",cat:"Service"},
-  {mot:"Vinted",cat:"Service"},
-  {mot:"Doctolib",cat:"Service"},
-  {mot:"Duolingo",cat:"Application"},
-  {mot:"ChatGPT",cat:"Technologie"},
-  {mot:"Wikipedia",cat:"Service"},
-  {mot:"Google Maps",cat:"Application"},
-  {mot:"Google Translate",cat:"Application"},
-  {mot:"Shazam",cat:"Application"},
-  {mot:"Tinder",cat:"Application"},
-  {mot:"Blague de tonton",cat:"Expression"},
-  {mot:"Soirée pyjama",cat:"Expérience"},
-  {mot:"Road trip",cat:"Expérience"},
-  {mot:"Camping",cat:"Expérience"},
-  {mot:"Escalade",cat:"Sport"},
-  {mot:"Parapente",cat:"Sport"},
-  {mot:"Kitesurf",cat:"Sport"},
-  {mot:"Ski nautique",cat:"Sport"},
-  {mot:"Escape game",cat:"Activité"},
-  {mot:"Karaoké",cat:"Activité"},
-  {mot:"Brunch",cat:"Repas"},
-  {mot:"Fondue savoyarde",cat:"Plat"},
-  {mot:"Raclette",cat:"Plat"},
-  {mot:"Kebab",cat:"Plat"},
-  {mot:"Naan",cat:"Plat"},
-  {mot:"Dim Sum",cat:"Plat"},
-  {mot:"Crêpe suzette",cat:"Plat"},
-  {mot:"Bubble tea",cat:"Boisson"},
-  {mot:"Matcha latte",cat:"Boisson"},
-  {mot:"Kombucha",cat:"Boisson"},
-  {mot:"Limoncello",cat:"Boisson"},
-  {mot:"Sangria",cat:"Boisson"},
-  {mot:"Mojito",cat:"Cocktail"},
-  {mot:"Tequila sunrise",cat:"Cocktail"},
-  {mot:"Détective Conan",cat:"Manga / Anime"},
-  {mot:"Naruto",cat:"Anime"},
-  {mot:"Dragon Ball Z",cat:"Anime"},
-  {mot:"One Piece",cat:"Anime"},
-  {mot:"Attack on Titan",cat:"Anime"},
-  {mot:"Death Note",cat:"Anime"},
-  {mot:"Sailor Moon",cat:"Anime"},
-  {mot:"Akira",cat:"Film / Manga"},
-  {mot:"Ghost in the Shell",cat:"Film"},
-  {mot:"Studio Ghibli",cat:"Studio"},
-  {mot:"Mon voisin Totoro",cat:"Film"},
-  {mot:"Spirited Away",cat:"Film"},
-  {mot:"Le Château ambulant",cat:"Film"},
-  {mot:"Kiki la petite sorcière",cat:"Film"},
-  {mot:"Wallace et Gromit",cat:"Personnage"},
-  {mot:"Tom et Jerry",cat:"Série animée"},
-  {mot:"Scooby-Doo",cat:"Série animée"},
-  {mot:"Les Simpson",cat:"Série animée"},
-  {mot:"South Park",cat:"Série animée"},
-  {mot:"Family Guy",cat:"Série animée"},
-  {mot:"Bob l'éponge",cat:"Série animée"},
-  {mot:"Futurama",cat:"Série animée"},
-  {mot:"Rick and Morty",cat:"Série animée"},
-  {mot:"Arcane",cat:"Série animée"},
-  {mot:"Gravity Falls",cat:"Série animée"},
-  {mot:"Avatar : le dernier maître de l'air",cat:"Série animée"},
-  {mot:"Cowboy Bebop",cat:"Anime"},
-  {mot:"Fullmetal Alchemist",cat:"Anime"},
-  {mot:"Sword Art Online",cat:"Anime"},
-  {mot:"Demon Slayer",cat:"Anime"},
-  {mot:"Jujutsu Kaisen",cat:"Anime"},
-  {mot:"My Hero Academia",cat:"Anime"},
-  {mot:"Hunter x Hunter",cat:"Anime"},
-  {mot:"Neon Genesis Evangelion",cat:"Anime"},
-  {mot:"Bleach",cat:"Anime"},
-  {mot:"Fairy Tail",cat:"Anime"},
-  {mot:"Boruto",cat:"Anime"},
-  {mot:"Chainsaw Man",cat:"Manga / Anime"},
-  {mot:"Spy x Family",cat:"Manga / Anime"},
-  {mot:"The Boys",cat:"Série"},
-  {mot:"Succession",cat:"Série"},
-  {mot:"Severance",cat:"Série"},
-  {mot:"Ted Lasso",cat:"Série"},
-  {mot:"White Lotus",cat:"Série"},
-  {mot:"Ozark",cat:"Série"},
-  {mot:"Chernobyl",cat:"Mini-série"},
-  {mot:"House of the Dragon",cat:"Série"},
-  {mot:"The Crown",cat:"Série"},
-  {mot:"Wednesday",cat:"Série"},
-  {mot:"Emily in Paris",cat:"Série"},
-  {mot:"Elite",cat:"Série"},
-  {mot:"Dark",cat:"Série"},
-  {mot:"Lupin",cat:"Série"},
-  {mot:"Kaamelott",cat:"Série"},
-  {mot:"Engrenages",cat:"Série"},
-  {mot:"Dix pour cent",cat:"Série"},
-  {mot:"Baron Noir",cat:"Série"},
-  {mot:"Intouchables",cat:"Film"},
-  {mot:"Amélie Poulain",cat:"Film"},
-  {mot:"Le Dîner de cons",cat:"Film"},
-  {mot:"Les Choristes",cat:"Film"},
-  {mot:"Bienvenue chez les Ch'tis",cat:"Film"},
-  {mot:"OSS 117",cat:"Film"},
-  {mot:"Les Visiteurs",cat:"Film"},
-  {mot:"Astérix et Obélix",cat:"Film / BD"},
-  {mot:"Lucky Luke",cat:"BD"},
-  {mot:"Tintin",cat:"BD"},
-  {mot:"Gaston Lagaffe",cat:"BD"},
-  {mot:"Les Schtroumpfs",cat:"BD"},
-  {mot:"Iznogoud",cat:"BD"},
-  {mot:"Le Petit Prince",cat:"Livre"},
-  {mot:"L'Étranger",cat:"Livre"},
-  {mot:"1984",cat:"Livre"},
-  {mot:"Le Seigneur des Anneaux",cat:"Livre / Film"},
-  {mot:"Game of Thrones",cat:"Livre / Série"},
-  {mot:"Dune",cat:"Livre / Film"},
-  {mot:"Hunger Games",cat:"Livre / Film"},
-  {mot:"Twilight",cat:"Livre / Film"},
-  {mot:"Cinquante nuances de Grey",cat:"Livre / Film"},
-  {mot:"Da Vinci Code",cat:"Livre / Film"},
-  {mot:"Sherlock Holmes",cat:"Livre / Série"},
-  {mot:"Don Quichotte",cat:"Livre"},
-  {mot:"Moby Dick",cat:"Livre"},
-  {mot:"Dracula",cat:"Livre / Personnage"},
-  {mot:"Frankenstein",cat:"Livre / Personnage"},
-  {mot:"Ulysse",cat:"Personnage mythologique"},
-  {mot:"Achille",cat:"Personnage mythologique"},
-  {mot:"Zeus",cat:"Personnage mythologique"},
-  {mot:"Athéna",cat:"Personnage mythologique"},
-  {mot:"Cléopâtre",cat:"Histoire"},
-  {mot:"Napoléon",cat:"Histoire"},
-  {mot:"Jeanne d'Arc",cat:"Histoire"},
-  {mot:"Jules César",cat:"Histoire"},
-  {mot:"Alexandre le Grand",cat:"Histoire"},
-  {mot:"Einstein",cat:"Célébrité"},
-  {mot:"Darwin",cat:"Célébrité"},
-  {mot:"Picasso",cat:"Célébrité"},
-  {mot:"Leonardo da Vinci",cat:"Célébrité"},
-  {mot:"Marie Curie",cat:"Célébrité"},
-  {mot:"Bill Gates",cat:"Célébrité"},
-  {mot:"Steve Jobs",cat:"Célébrité"},
-  {mot:"Elon Musk",cat:"Célébrité"},
-  {mot:"Mark Zuckerberg",cat:"Célébrité"},
-  {mot:"Jeff Bezos",cat:"Célébrité"},
-  {mot:"Obama",cat:"Célébrité"},
-  {mot:"Mandela",cat:"Célébrité"},
-  {mot:"Macron",cat:"Célébrité"},
-  {mot:"Brigitte Bardot",cat:"Célébrité"},
-  {mot:"Coluche",cat:"Célébrité"},
-  {mot:"Jacques Chirac",cat:"Célébrité"},
-  {mot:"Zinédine Zidane",cat:"Célébrité"},
-  {mot:"Thierry Henry",cat:"Célébrité"},
-  {mot:"Didier Deschamps",cat:"Célébrité"},
-  {mot:"Tony Parker",cat:"Célébrité"},
-  {mot:"Teddy Riner",cat:"Célébrité"},
-  {mot:"Jo-Wilfried Tsonga",cat:"Célébrité"},
-  {mot:"Amélie Mauresmo",cat:"Célébrité"},
-  {mot:"Ligue des Champions",cat:"Événement"},
-  {mot:"Super Bowl",cat:"Événement"},
-  {mot:"Wimbledon",cat:"Événement"},
-  {mot:"Stade de France",cat:"Lieu"},
-  {mot:"Wembley",cat:"Lieu"},
-  {mot:"Madison Square Garden",cat:"Lieu"},
-  {mot:"Maracana",cat:"Lieu"},
-  {mot:"Camp Nou",cat:"Lieu"},
-  {mot:"San Siro",cat:"Lieu"},
-  {mot:"Old Trafford",cat:"Lieu"},
-  {mot:"Bungee jumping",cat:"Sport extrême"},
-  {mot:"Wingsuit",cat:"Sport extrême"},
-  {mot:"Base jump",cat:"Sport extrême"},
-  {mot:"Skateboard",cat:"Sport"},
-  {mot:"BMX",cat:"Sport"},
-  {mot:"Breakdance",cat:"Danse"},
-  {mot:"Twerk",cat:"Danse"},
-  {mot:"Macarena",cat:"Danse"},
-  {mot:"Harlem Shake",cat:"Phénomène culturel"},
-  {mot:"Ice Bucket Challenge",cat:"Phénomène culturel"},
-  {mot:"Mannequin Challenge",cat:"Phénomène culturel"},
-  {mot:"Gangnam Style",cat:"Chanson"},
-  {mot:"Baby Shark",cat:"Chanson"},
-  {mot:"Despacito",cat:"Chanson"},
-  {mot:"Thriller",cat:"Chanson"},
-  {mot:"Bohemian Rhapsody",cat:"Chanson"},
-  {mot:"Hotel California",cat:"Chanson"},
-  {mot:"Smells Like Teen Spirit",cat:"Chanson"},
-  {mot:"We Will Rock You",cat:"Chanson"},
-  {mot:"Highway to Hell",cat:"Chanson"},
-  {mot:"Back in Black",cat:"Chanson"},
-  {mot:"Stairway to Heaven",cat:"Chanson"},
-  {mot:"Purple Rain",cat:"Chanson"},
-  {mot:"Imagine",cat:"Chanson"},
-  {mot:"Billie Jean",cat:"Chanson"},
-  {mot:"Shape of You",cat:"Chanson"},
-  {mot:"Blinding Lights",cat:"Chanson"},
-  {mot:"Old Town Road",cat:"Chanson"},
-  {mot:"Sicko Mode",cat:"Chanson"},
-  {mot:"Rockstar",cat:"Chanson"},
-  {mot:"See You Again",cat:"Chanson"},
-  {mot:"Uptown Funk",cat:"Chanson"},
-  {mot:"Happy",cat:"Chanson"},
-  {mot:"Roar",cat:"Chanson"},
-  {mot:"Rolling in the Deep",cat:"Chanson"},
-  {mot:"Diamonds",cat:"Chanson"},
-  {mot:"Stay",cat:"Chanson"},
-  {mot:"Levitating",cat:"Chanson"},
-  {mot:"Good 4 U",cat:"Chanson"},
-  {mot:"Drivers License",cat:"Chanson"},
-  {mot:"Watermelon Sugar",cat:"Chanson"},
-  {mot:"Industry Baby",cat:"Chanson"},
-  {mot:"Montero",cat:"Chanson"},
-  {mot:"Kiss Me More",cat:"Chanson"},
-  {mot:"Peaches",cat:"Chanson"},
-  {mot:"Leave the Door Open",cat:"Chanson"},
-  {mot:"Butter",cat:"Chanson"},
-  {mot:"Permission to Dance",cat:"Chanson"},
-  {mot:"Savage Love",cat:"Chanson"},
-  {mot:"Mood",cat:"Chanson"},
-  {mot:"Positions",cat:"Chanson"},
-  {mot:"34+35",cat:"Chanson"},
-  {mot:"Dynamite",cat:"Chanson"},
-  {mot:"Lemon",cat:"Chanson"},
-  {mot:"Bling-Bling",cat:"Expression"},
-  {mot:"YOLO",cat:"Expression"},
-  {mot:"FOMO",cat:"Expression"},
-  {mot:"LOL",cat:"Expression"},
-  {mot:"WTF",cat:"Expression"},
-  {mot:"On est bien",cat:"Expression"},
-  {mot:"Chiller",cat:"Expression"},
-  {mot:"Kiffer",cat:"Verlan / Argot"},
-  {mot:"Laisse béton",cat:"Verlan"},
-  {mot:"Meuf",cat:"Verlan"},
-  {mot:"Chelou",cat:"Verlan"},
-  {mot:"Teuf",cat:"Verlan"},
-  {mot:"Faire la teuf",cat:"Expression"},
-  {mot:"Afterwork",cat:"Activité"},
-  {mot:"Apéro dinatoire",cat:"Repas"},
-  {mot:"Cheese board",cat:"Nourriture"},
-  {mot:"Smash Burger",cat:"Nourriture"},
-  {mot:"Smoothie bowl",cat:"Nourriture"},
-  {mot:"Avocado toast",cat:"Nourriture"},
-  {mot:"Overnight oats",cat:"Nourriture"},
-  {mot:"Food truck",cat:"Concept"},
-  {mot:"Dark kitchen",cat:"Concept"},
-  {mot:"Michelin",cat:"Marque"},
-  {mot:"Gordon Ramsay",cat:"Célébrité"},
-  {mot:"Cyril Lignac",cat:"Célébrité"},
-  {mot:"Thierry Marx",cat:"Célébrité"},
-  {mot:"Masterchef",cat:"Émission"},
-  {mot:"Top Chef",cat:"Émission"},
-  {mot:"The Voice",cat:"Émission"},
-  {mot:"Koh-Lanta",cat:"Émission"},
-  {mot:"N'oubliez pas les paroles",cat:"Émission"},
-  {mot:"Fort Boyard",cat:"Émission"},
-  {mot:"Qui veut gagner des millions",cat:"Émission"},
-  {mot:"Pékin Express",cat:"Émission"},
-  {mot:"L'Amour est dans le pré",cat:"Émission"},
-  {mot:"Secret Story",cat:"Émission"},
-  {mot:"Les Marseillais",cat:"Émission"},
-  {mot:"Loft Story",cat:"Émission"},
-  {mot:"Stade Vélodrome",cat:"Lieu"},
-  {mot:"Parc des Princes",cat:"Lieu"},
-  {mot:"Musée du Louvre",cat:"Lieu"},
-  {mot:"Château de Versailles",cat:"Lieu"},
-  {mot:"Mont-Saint-Michel",cat:"Lieu"},
-  {mot:"Côte d'Azur",cat:"Lieu"},
-  {mot:"Gorges du Verdon",cat:"Lieu"},
-  {mot:"Dune du Pilat",cat:"Lieu"},
-  {mot:"Pont du Gard",cat:"Lieu"},
-  {mot:"Catacombes de Paris",cat:"Lieu"},
-  {mot:"Moulin Rouge",cat:"Lieu"},
-  {mot:"Pigalle",cat:"Lieu"},
-  {mot:"Quartier Latin",cat:"Lieu"},
-  {mot:"La Défense",cat:"Lieu"},
-  {mot:"Saint-Tropez",cat:"Lieu"},
-  {mot:"Monaco",cat:"Lieu"},
-  {mot:"Courchevel",cat:"Lieu"},
-  {mot:"Chamonix",cat:"Lieu"},
-  {mot:"Le Mans",cat:"Lieu / Événement"},
-  {mot:"Circuit de Monaco",cat:"Lieu"},
-  {mot:"Formula 1",cat:"Sport"},
-  {mot:"MotoGP",cat:"Sport"},
-  {mot:"Nascar",cat:"Sport"},
-  {mot:"Rallye Dakar",cat:"Événement"},
-  {mot:"Tour du monde en ballon",cat:"Exploit"},
-  {mot:"Everest",cat:"Nature"},
-  {mot:"K2",cat:"Nature"},
-  {mot:"Grand Canyon",cat:"Nature"},
-  {mot:"Niagara Falls",cat:"Nature"},
-  {mot:"Galápagos",cat:"Lieu"},
-  {mot:"Machu Picchu",cat:"Lieu"},
-  {mot:"Angkor Vat",cat:"Lieu"},
-  {mot:"Petra",cat:"Lieu"},
-  {mot:"Stonehenge",cat:"Lieu"},
-  {mot:"Colisée",cat:"Lieu"},
-  {mot:"Acropole",cat:"Lieu"},
-  {mot:"Sagrada Família",cat:"Lieu"},
-  {mot:"Big Ben",cat:"Lieu"},
-  {mot:"Statue de la Liberté",cat:"Lieu"},
-  {mot:"Mount Rushmore",cat:"Lieu"},
-  {mot:"Golden Gate",cat:"Lieu"},
-  {mot:"Empire State Building",cat:"Lieu"},
-  {mot:"Burj Khalifa",cat:"Lieu"},
-  {mot:"Grande Muraille de Chine",cat:"Lieu"},
-  {mot:"Pyramides de Gizeh",cat:"Lieu"},
-  {mot:"Trocadéro",cat:"Lieu"},
-  {mot:"Place de la Bastille",cat:"Lieu"},
-  {mot:"Arc de Triomphe",cat:"Lieu"},
+  // Nourriture & Boissons
+  {m:"Nutella",c:"Marque"},{m:"Croissant",c:"Nourriture"},{m:"Sushi",c:"Nourriture"},
+  {m:"Pizza",c:"Nourriture"},{m:"Ramen",c:"Nourriture"},{m:"Tiramisu",c:"Nourriture"},
+  {m:"Hamburger",c:"Nourriture"},{m:"Tacos",c:"Nourriture"},{m:"Raclette",c:"Plat"},
+  {m:"Fondue",c:"Plat"},{m:"Kebab",c:"Nourriture"},{m:"Naan",c:"Nourriture"},
+  {m:"Dim Sum",c:"Nourriture"},{m:"Crêpe",c:"Nourriture"},{m:"Croissant au beurre",c:"Nourriture"},
+  {m:"Bubble Tea",c:"Boisson"},{m:"Matcha Latte",c:"Boisson"},{m:"Kombucha",c:"Boisson"},
+  {m:"Mojito",c:"Cocktail"},{m:"Tequila Sunrise",c:"Cocktail"},{m:"Sangria",c:"Boisson"},
+  {m:"Coca-Cola",c:"Boisson"},{m:"Red Bull",c:"Boisson"},{m:"Chocolat chaud",c:"Boisson"},
+  {m:"Limonade",c:"Boisson"},{m:"Smoothie",c:"Boisson"},{m:"Jus de mangue",c:"Boisson"},
+  {m:"Avocado Toast",c:"Nourriture"},{m:"Overnight Oats",c:"Nourriture"},{m:"Smash Burger",c:"Nourriture"},
+  {m:"Hot Dog",c:"Nourriture"},{m:"Baozi",c:"Nourriture"},{m:"Pierogi",c:"Nourriture"},
+  {m:"Paella",c:"Plat"},{m:"Couscous",c:"Plat"},{m:"Tajine",c:"Plat"},
+  {m:"Bolognese",c:"Plat"},{m:"Carbonara",c:"Plat"},{m:"Risotto",c:"Plat"},
+  {m:"Bruschetta",c:"Nourriture"},{m:"Tapas",c:"Nourriture"},{m:"Churros",c:"Nourriture"},
+  {m:"Macaron",c:"Pâtisserie"},{m:"Éclair au chocolat",c:"Pâtisserie"},{m:"Mille-feuille",c:"Pâtisserie"},
+  {m:"Crème brûlée",c:"Dessert"},{m:"Mousse au chocolat",c:"Dessert"},{m:"Profiteroles",c:"Dessert"},
+  {m:"Cheese Cake",c:"Dessert"},{m:"Brownie",c:"Gâteau"},{m:"Pancakes",c:"Nourriture"},
+  {m:"Waffles",c:"Nourriture"},{m:"Açaï Bowl",c:"Nourriture"},{m:"Poke Bowl",c:"Nourriture"},
+  {m:"Burritos",c:"Nourriture"},{m:"Quesadilla",c:"Nourriture"},{m:"Guacamole",c:"Nourriture"},
+  {m:"Nachos",c:"Nourriture"},{m:"Falafel",c:"Nourriture"},{m:"Hummus",c:"Nourriture"},
+  {m:"Shawarma",c:"Nourriture"},{m:"Gyros",c:"Nourriture"},{m:"Pad Thai",c:"Plat"},
+  {m:"Curry",c:"Plat"},{m:"Samoussa",c:"Nourriture"},{m:"Spring Roll",c:"Nourriture"},
+  {m:"Tonkatsu",c:"Plat"},{m:"Bibimbap",c:"Plat"},{m:"Kimchi",c:"Plat"},
+  {m:"Pho",c:"Soupe"},{m:"Tom Yum",c:"Soupe"},{m:"Gaspacho",c:"Soupe"},
+  {m:"Soupe miso",c:"Soupe"},{m:"Ratatouille",c:"Plat"},{m:"Quiche Lorraine",c:"Plat"},
+  {m:"Croque-monsieur",c:"Nourriture"},{m:"Pain perdu",c:"Nourriture"},{m:"Gaufre liégeoise",c:"Nourriture"},
+  {m:"Stroopwafel",c:"Nourriture"},{m:"Pretzel",c:"Nourriture"},{m:"Bagel",c:"Nourriture"},
+  {m:"Club Sandwich",c:"Nourriture"},{m:"Wrap",c:"Nourriture"},{m:"Caesar Salad",c:"Salade"},
+  {m:"Nicoise Salad",c:"Salade"},{m:"Mozzarella",c:"Fromage"},{m:"Brie",c:"Fromage"},
+  {m:"Camembert",c:"Fromage"},{m:"Gruyère",c:"Fromage"},{m:"Roquefort",c:"Fromage"},
+  {m:"Parmesan",c:"Fromage"},{m:"Feta",c:"Fromage"},{m:"Tofu",c:"Nourriture"},
+  {m:"Tempeh",c:"Nourriture"},{m:"Seitan",c:"Nourriture"},{m:"Caviar",c:"Nourriture"},
+  {m:"Foie Gras",c:"Nourriture"},{m:"Truffe",c:"Nourriture"},{m:"Magret de canard",c:"Plat"},
+  {m:"Blanquette de veau",c:"Plat"},{m:"Boeuf Bourguignon",c:"Plat"},{m:"Cassoulet",c:"Plat"},
+  {m:"Bouillabaisse",c:"Plat"},{m:"Choucroute",c:"Plat"},{m:"Tarte Tatin",c:"Dessert"},
+  {m:"Île flottante",c:"Dessert"},{m:"Soufflé",c:"Plat"},{m:"Crêpe Suzette",c:"Dessert"},
+  {m:"Café allongé",c:"Boisson"},{m:"Café noisette",c:"Boisson"},{m:"Expresso",c:"Boisson"},
+  {m:"Cappuccino",c:"Boisson"},{m:"Flat White",c:"Boisson"},{m:"Iced Latte",c:"Boisson"},
+  {m:"Thé Earl Grey",c:"Boisson"},{m:"Tisane",c:"Boisson"},{m:"Kéfir",c:"Boisson"},
+  {m:"Eau pétillante",c:"Boisson"},{m:"Kir Royal",c:"Cocktail"},{m:"Spritz",c:"Cocktail"},
+  {m:"Negroni",c:"Cocktail"},{m:"Margarita",c:"Cocktail"},{m:"Cosmopolitan",c:"Cocktail"},
+  {m:"Gin Tonic",c:"Cocktail"},{m:"Whisky Sour",c:"Cocktail"},{m:"Dark & Stormy",c:"Cocktail"},
+  // Films
+  {m:"Inception",c:"Film"},{m:"Interstellar",c:"Film"},{m:"Titanic",c:"Film"},
+  {m:"Pulp Fiction",c:"Film"},{m:"Parasite",c:"Film"},{m:"Avatar",c:"Film"},
+  {m:"Le Roi Lion",c:"Film"},{m:"Toy Story",c:"Film"},{m:"Shrek",c:"Film"},
+  {m:"Intouchables",c:"Film"},{m:"Amélie Poulain",c:"Film"},{m:"Le Dîner de cons",c:"Film"},
+  {m:"Les Choristes",c:"Film"},{m:"Bienvenue chez les Ch'tis",c:"Film"},
+  {m:"OSS 117",c:"Film"},{m:"Les Visiteurs",c:"Film"},{m:"Astérix et Obélix",c:"Film"},
+  {m:"Kaamelott : Premier volet",c:"Film"},{m:"Le Grand Bain",c:"Film"},
+  {m:"La Haine",c:"Film"},{m:"Le Fabuleux Destin d'Amélie Poulain",c:"Film"},
+  {m:"Dune",c:"Film"},{m:"Oppenheimer",c:"Film"},{m:"Barbie",c:"Film"},
+  {m:"The Dark Knight",c:"Film"},{m:"Fight Club",c:"Film"},{m:"Forrest Gump",c:"Film"},
+  {m:"The Matrix",c:"Film"},{m:"Gladiator",c:"Film"},{m:"The Godfather",c:"Film"},
+  {m:"Schindler's List",c:"Film"},{m:"The Shawshank Redemption",c:"Film"},
+  {m:"Goodfellas",c:"Film"},{m:"Scarface",c:"Film"},{m:"Joker",c:"Film"},
+  {m:"Spider-Man: No Way Home",c:"Film"},{m:"Avengers: Endgame",c:"Film"},
+  {m:"Black Panther",c:"Film"},{m:"Doctor Strange",c:"Film"},{m:"Thor: Ragnarok",c:"Film"},
+  {m:"Guardians of the Galaxy",c:"Film"},{m:"Wonder Woman",c:"Film"},
+  {m:"Aquaman",c:"Film"},{m:"Suicide Squad",c:"Film"},{m:"Logan",c:"Film"},
+  {m:"Deadpool",c:"Film"},{m:"X-Men",c:"Film"},{m:"Star Wars",c:"Film"},
+  {m:"Indiana Jones",c:"Film"},{m:"Jurassic Park",c:"Film"},{m:"E.T.",c:"Film"},
+  {m:"Back to the Future",c:"Film"},{m:"Ghostbusters",c:"Film"},
+  {m:"The Truman Show",c:"Film"},{m:"Cast Away",c:"Film"},{m:"Philadelphia",c:"Film"},
+  {m:"Catch Me If You Can",c:"Film"},{m:"The Terminal",c:"Film"},
+  {m:"Saving Private Ryan",c:"Film"},{m:"Dunkirk",c:"Film"},
+  {m:"1917",c:"Film"},{m:"Apocalypse Now",c:"Film"},{m:"Full Metal Jacket",c:"Film"},
+  {m:"Platoon",c:"Film"},{m:"The Hurt Locker",c:"Film"},{m:"Zero Dark Thirty",c:"Film"},
+  {m:"No Country for Old Men",c:"Film"},{m:"Fargo",c:"Film"},
+  {m:"The Big Lebowski",c:"Film"},{m:"Burn After Reading",c:"Film"},
+  {m:"Knives Out",c:"Film"},{m:"Glass Onion",c:"Film"},{m:"Get Out",c:"Film"},
+  {m:"Us",c:"Film"},{m:"Nope",c:"Film"},{m:"The Sixth Sense",c:"Film"},
+  {m:"Hereditary",c:"Film"},{m:"Midsommar",c:"Film"},{m:"A Quiet Place",c:"Film"},
+  {m:"It",c:"Film"},{m:"The Conjuring",c:"Film"},{m:"Insidious",c:"Film"},
+  {m:"Saw",c:"Film"},{m:"Scream",c:"Film"},{m:"Halloween",c:"Film"},
+  {m:"Friday the 13th",c:"Film"},{m:"A Nightmare on Elm Street",c:"Film"},
+  {m:"Alien",c:"Film"},{m:"Predator",c:"Film"},{m:"Terminator",c:"Film"},
+  {m:"RoboCop",c:"Film"},{m:"Total Recall",c:"Film"},{m:"The Fifth Element",c:"Film"},
+  {m:"The Hunger Games",c:"Film"},{m:"Divergent",c:"Film"},{m:"Maze Runner",c:"Film"},
+  {m:"Twilight",c:"Film"},{m:"Harry Potter",c:"Film"},{m:"Le Seigneur des Anneaux",c:"Film"},
+  {m:"Le Hobbit",c:"Film"},{m:"Narnia",c:"Film"},{m:"Percy Jackson",c:"Film"},
+  {m:"La Cité des Ténèbres",c:"Film"},{m:"Divergente",c:"Film"},
+  {m:"La La Land",c:"Film"},{m:"Whiplash",c:"Film"},{m:"Black Swan",c:"Film"},
+  {m:"Requiem for a Dream",c:"Film"},{m:"Pi",c:"Film"},{m:"Mulholland Drive",c:"Film"},
+  {m:"Lost Highway",c:"Film"},{m:"Blue Velvet",c:"Film"},{m:"Twin Peaks : Fire Walk with Me",c:"Film"},
+  {m:"2001: L'Odyssée de l'espace",c:"Film"},{m:"A Clockwork Orange",c:"Film"},
+  {m:"The Shining",c:"Film"},{m:"Eyes Wide Shut",c:"Film"},{m:"Barry Lyndon",c:"Film"},
+  {m:"Spirited Away",c:"Film"},{m:"Mon voisin Totoro",c:"Film"},
+  {m:"Le Château ambulant",c:"Film"},{m:"Princesse Mononoké",c:"Film"},
+  {m:"Nausicaä",c:"Film"},{m:"Porco Rosso",c:"Film"},{m:"Le Tombeau des lucioles",c:"Film"},
+  {m:"Akira",c:"Film"},{m:"Ghost in the Shell",c:"Film"},{m:"Perfect Blue",c:"Film"},
+  {m:"Paprika",c:"Film"},{m:"Summer Wars",c:"Film"},{m:"Wolf Children",c:"Film"},
+  {m:"Your Name",c:"Film"},{m:"A Silent Voice",c:"Film"},{m:"Weathering with You",c:"Film"},
+  {m:"Belle",c:"Film"},{m:"The Boy and the Heron",c:"Film"},
+  {m:"Klaus",c:"Film"},{m:"Wolfwalkers",c:"Film"},{m:"The Breadwinner",c:"Film"},
+  {m:"Into the Spider-Verse",c:"Film"},{m:"Across the Spider-Verse",c:"Film"},
+  {m:"The Incredibles",c:"Film"},{m:"Finding Nemo",c:"Film"},{m:"WALL-E",c:"Film"},
+  {m:"Up",c:"Film"},{m:"Inside Out",c:"Film"},{m:"Coco",c:"Film"},
+  {m:"Soul",c:"Film"},{m:"Luca",c:"Film"},{m:"Turning Red",c:"Film"},
+  {m:"Encanto",c:"Film"},{m:"Moana",c:"Film"},{m:"Frozen",c:"Film"},
+  {m:"Tangled",c:"Film"},{m:"Brave",c:"Film"},{m:"Zootopia",c:"Film"},
+  {m:"Wreck-It Ralph",c:"Film"},{m:"Big Hero 6",c:"Film"},
+  // Séries
+  {m:"Breaking Bad",c:"Série"},{m:"Game of Thrones",c:"Série"},
+  {m:"Stranger Things",c:"Série"},{m:"La Casa de Papel",c:"Série"},
+  {m:"Friends",c:"Série"},{m:"Squid Game",c:"Série"},{m:"Peaky Blinders",c:"Série"},
+  {m:"Black Mirror",c:"Série"},{m:"Narcos",c:"Série"},{m:"Euphoria",c:"Série"},
+  {m:"The Office",c:"Série"},{m:"The Boys",c:"Série"},{m:"Succession",c:"Série"},
+  {m:"Severance",c:"Série"},{m:"Ted Lasso",c:"Série"},{m:"White Lotus",c:"Série"},
+  {m:"Ozark",c:"Série"},{m:"Chernobyl",c:"Série"},{m:"House of the Dragon",c:"Série"},
+  {m:"The Crown",c:"Série"},{m:"Wednesday",c:"Série"},{m:"Emily in Paris",c:"Série"},
+  {m:"Elite",c:"Série"},{m:"Dark",c:"Série"},{m:"Lupin",c:"Série"},
+  {m:"Kaamelott",c:"Série"},{m:"Engrenages",c:"Série"},{m:"Dix pour cent",c:"Série"},
+  {m:"Baron Noir",c:"Série"},{m:"Marseille",c:"Série"},{m:"Plan Cœur",c:"Série"},
+  {m:"Validé",c:"Série"},{m:"Skam France",c:"Série"},{m:"Mortel",c:"Série"},
+  {m:"Le Bureau des légendes",c:"Série"},{m:"Spiral",c:"Série"},
+  {m:"Mindhunter",c:"Série"},{m:"True Detective",c:"Série"},{m:"Dexter",c:"Série"},
+  {m:"The Wire",c:"Série"},{m:"The Sopranos",c:"Série"},{m:"Mad Men",c:"Série"},
+  {m:"House of Cards",c:"Série"},{m:"Homeland",c:"Série"},{m:"24 heures chrono",c:"Série"},
+  {m:"Prison Break",c:"Série"},{m:"Lost",c:"Série"},{m:"Desperate Housewives",c:"Série"},
+  {m:"Grey's Anatomy",c:"Série"},{m:"ER",c:"Série"},{m:"House MD",c:"Série"},
+  {m:"Scrubs",c:"Série"},{m:"Two and a Half Men",c:"Série"},{m:"How I Met Your Mother",c:"Série"},
+  {m:"Big Bang Theory",c:"Série"},{m:"Seinfeld",c:"Série"},{m:"Cheers",c:"Série"},
+  {m:"Frasier",c:"Série"},{m:"Curb Your Enthusiasm",c:"Série"},
+  {m:"It's Always Sunny in Philadelphia",c:"Série"},{m:"Parks and Recreation",c:"Série"},
+  {m:"Brooklyn Nine-Nine",c:"Série"},{m:"Arrested Development",c:"Série"},
+  {m:"Fleabag",c:"Série"},{m:"Killing Eve",c:"Série"},{m:"Bodyguard",c:"Série"},
+  {m:"Sherlock",c:"Série"},{m:"Downton Abbey",c:"Série"},{m:"Peaky Blinders",c:"Série"},
+  {m:"The Witcher",c:"Série"},{m:"Bridgerton",c:"Série"},{m:"Outlander",c:"Série"},
+  {m:"Vikings",c:"Série"},{m:"Westworld",c:"Série"},{m:"Altered Carbon",c:"Série"},
+  {m:"The Expanse",c:"Série"},{m:"Battlestar Galactica",c:"Série"},
+  {m:"Firefly",c:"Série"},{m:"Stargate",c:"Série"},{m:"Fringe",c:"Série"},
+  {m:"Alias",c:"Série"},{m:"Heroes",c:"Série"},{m:"Flashforward",c:"Série"},
+  {m:"The Mandalorian",c:"Série"},{m:"Andor",c:"Série"},{m:"Obi-Wan Kenobi",c:"Série"},
+  {m:"Loki",c:"Série"},{m:"WandaVision",c:"Série"},{m:"Hawkeye",c:"Série"},
+  {m:"Moon Knight",c:"Série"},{m:"She-Hulk",c:"Série"},{m:"Ms. Marvel",c:"Série"},
+  // Anime
+  {m:"Naruto",c:"Anime"},{m:"Dragon Ball Z",c:"Anime"},{m:"One Piece",c:"Anime"},
+  {m:"Attack on Titan",c:"Anime"},{m:"Death Note",c:"Anime"},{m:"Sailor Moon",c:"Anime"},
+  {m:"Fullmetal Alchemist",c:"Anime"},{m:"Sword Art Online",c:"Anime"},
+  {m:"Demon Slayer",c:"Anime"},{m:"Jujutsu Kaisen",c:"Anime"},
+  {m:"My Hero Academia",c:"Anime"},{m:"Hunter x Hunter",c:"Anime"},
+  {m:"Bleach",c:"Anime"},{m:"Fairy Tail",c:"Anime"},{m:"Boruto",c:"Anime"},
+  {m:"Chainsaw Man",c:"Anime"},{m:"Spy x Family",c:"Anime"},{m:"Haikyuu",c:"Anime"},
+  {m:"Kuroko no Basket",c:"Anime"},{m:"Slam Dunk",c:"Anime"},
+  {m:"Captain Tsubasa",c:"Anime"},{m:"Eyeshield 21",c:"Anime"},
+  {m:"Pokémon",c:"Anime"},{m:"Digimon",c:"Anime"},{m:"Yu-Gi-Oh",c:"Anime"},
+  {m:"Beyblade",c:"Anime"},{m:"Dragon Ball",c:"Anime"},{m:"Dragon Ball Super",c:"Anime"},
+  {m:"One Punch Man",c:"Anime"},{m:"Mob Psycho 100",c:"Anime"},
+  {m:"Neon Genesis Evangelion",c:"Anime"},{m:"Cowboy Bebop",c:"Anime"},
+  {m:"Trigun",c:"Anime"},{m:"Outlaw Star",c:"Anime"},{m:"Rurouni Kenshin",c:"Anime"},
+  {m:"InuYasha",c:"Anime"},{m:"Ranma 1/2",c:"Anime"},{m:"Urusei Yatsura",c:"Anime"},
+  {m:"Doraemon",c:"Anime"},{m:"Shin-chan",c:"Anime"},{m:"Detective Conan",c:"Anime"},
+  {m:"Lupin III",c:"Anime"},{m:"Golgo 13",c:"Anime"},{m:"Space Dandy",c:"Anime"},
+  {m:"Gurren Lagann",c:"Anime"},{m:"Kill la Kill",c:"Anime"},{m:"Little Witch Academia",c:"Anime"},
+  {m:"Violet Evergarden",c:"Anime"},{m:"Your Lie in April",c:"Anime"},
+  {m:"Anohana",c:"Anime"},{m:"Clannad",c:"Anime"},{m:"Angel Beats",c:"Anime"},
+  {m:"Re:Zero",c:"Anime"},{m:"Overlord",c:"Anime"},{m:"That Time I Got Reincarnated as a Slime",c:"Anime"},
+  {m:"Sword Art Online Alicization",c:"Anime"},{m:"No Game No Life",c:"Anime"},
+  {m:"Konosuba",c:"Anime"},{m:"Shield Hero",c:"Anime"},
+  // Jeux vidéo
+  {m:"The Last of Us",c:"Jeu vidéo"},{m:"GTA V",c:"Jeu vidéo"},{m:"FIFA",c:"Jeu vidéo"},
+  {m:"Call of Duty",c:"Jeu vidéo"},{m:"League of Legends",c:"Jeu vidéo"},
+  {m:"Among Us",c:"Jeu vidéo"},{m:"Super Mario",c:"Jeu vidéo"},{m:"Tetris",c:"Jeu vidéo"},
+  {m:"Minecraft",c:"Jeu vidéo"},{m:"Fortnite",c:"Jeu vidéo"},
+  {m:"The Legend of Zelda",c:"Jeu vidéo"},{m:"Metroid",c:"Jeu vidéo"},
+  {m:"Kirby",c:"Jeu vidéo"},{m:"Donkey Kong",c:"Jeu vidéo"},{m:"Yoshi",c:"Jeu vidéo"},
+  {m:"Splatoon",c:"Jeu vidéo"},{m:"Animal Crossing",c:"Jeu vidéo"},{m:"Pokemon Go",c:"Jeu vidéo"},
+  {m:"Clash of Clans",c:"Jeu vidéo"},{m:"Candy Crush",c:"Jeu vidéo"},{m:"Angry Birds",c:"Jeu vidéo"},
+  {m:"Flappy Bird",c:"Jeu vidéo"},{m:"Temple Run",c:"Jeu vidéo"},{m:"Subway Surfers",c:"Jeu vidéo"},
+  {m:"Roblox",c:"Jeu vidéo"},{m:"Valorant",c:"Jeu vidéo"},{m:"Apex Legends",c:"Jeu vidéo"},
+  {m:"Overwatch",c:"Jeu vidéo"},{m:"Rainbow Six Siege",c:"Jeu vidéo"},
+  {m:"Counter-Strike",c:"Jeu vidéo"},{m:"Dota 2",c:"Jeu vidéo"},
+  {m:"World of Warcraft",c:"Jeu vidéo"},{m:"Final Fantasy",c:"Jeu vidéo"},
+  {m:"Dark Souls",c:"Jeu vidéo"},{m:"Elden Ring",c:"Jeu vidéo"},{m:"Sekiro",c:"Jeu vidéo"},
+  {m:"Bloodborne",c:"Jeu vidéo"},{m:"Demon's Souls",c:"Jeu vidéo"},
+  {m:"God of War",c:"Jeu vidéo"},{m:"Horizon Zero Dawn",c:"Jeu vidéo"},
+  {m:"Spider-Man",c:"Jeu vidéo"},{m:"Ghost of Tsushima",c:"Jeu vidéo"},
+  {m:"Detroit: Become Human",c:"Jeu vidéo"},{m:"Heavy Rain",c:"Jeu vidéo"},
+  {m:"Beyond: Two Souls",c:"Jeu vidéo"},{m:"Life is Strange",c:"Jeu vidéo"},
+  {m:"Until Dawn",c:"Jeu vidéo"},{m:"The Witcher 3",c:"Jeu vidéo"},
+  {m:"Cyberpunk 2077",c:"Jeu vidéo"},{m:"Red Dead Redemption",c:"Jeu vidéo"},
+  {m:"Assassin's Creed",c:"Jeu vidéo"},{m:"Far Cry",c:"Jeu vidéo"},
+  {m:"Watch Dogs",c:"Jeu vidéo"},{m:"Just Dance",c:"Jeu vidéo"},
+  {m:"Guitar Hero",c:"Jeu vidéo"},{m:"Rock Band",c:"Jeu vidéo"},
+  {m:"Wii Sports",c:"Jeu vidéo"},{m:"Mario Kart",c:"Jeu vidéo"},
+  {m:"Smash Bros",c:"Jeu vidéo"},{m:"Stardew Valley",c:"Jeu vidéo"},
+  {m:"Hollow Knight",c:"Jeu vidéo"},{m:"Celeste",c:"Jeu vidéo"},
+  {m:"Hades",c:"Jeu vidéo"},{m:"Dead Cells",c:"Jeu vidéo"},
+  {m:"Cuphead",c:"Jeu vidéo"},{m:"Undertale",c:"Jeu vidéo"},
+  {m:"Disco Elysium",c:"Jeu vidéo"},{m:"Baldur's Gate 3",c:"Jeu vidéo"},
+  {m:"Divinity: Original Sin",c:"Jeu vidéo"},{m:"Pillars of Eternity",c:"Jeu vidéo"},
+  // Musique
+  {m:"Gangnam Style",c:"Chanson"},{m:"Baby Shark",c:"Chanson"},{m:"Despacito",c:"Chanson"},
+  {m:"Thriller",c:"Chanson"},{m:"Bohemian Rhapsody",c:"Chanson"},
+  {m:"Hotel California",c:"Chanson"},{m:"Smells Like Teen Spirit",c:"Chanson"},
+  {m:"We Will Rock You",c:"Chanson"},{m:"Highway to Hell",c:"Chanson"},
+  {m:"Stairway to Heaven",c:"Chanson"},{m:"Purple Rain",c:"Chanson"},
+  {m:"Imagine",c:"Chanson"},{m:"Billie Jean",c:"Chanson"},{m:"Shape of You",c:"Chanson"},
+  {m:"Blinding Lights",c:"Chanson"},{m:"Old Town Road",c:"Chanson"},
+  {m:"Rolling in the Deep",c:"Chanson"},{m:"Uptown Funk",c:"Chanson"},
+  {m:"Happy",c:"Chanson"},{m:"Levitating",c:"Chanson"},{m:"Good 4 U",c:"Chanson"},
+  {m:"Drivers License",c:"Chanson"},{m:"Watermelon Sugar",c:"Chanson"},
+  {m:"Peaches",c:"Chanson"},{m:"Butter",c:"Chanson"},{m:"Dynamite",c:"Chanson"},
+  {m:"Stay",c:"Chanson"},{m:"Industry Baby",c:"Chanson"},{m:"Montero",c:"Chanson"},
+  {m:"Savage Love",c:"Chanson"},{m:"Mood",c:"Chanson"},{m:"Positions",c:"Chanson"},
+  {m:"34+35",c:"Chanson"},{m:"WAP",c:"Chanson"},{m:"Rockstar",c:"Chanson"},
+  {m:"See You Again",c:"Chanson"},{m:"Sicko Mode",c:"Chanson"},
+  {m:"God's Plan",c:"Chanson"},{m:"In My Feelings",c:"Chanson"},
+  {m:"One Dance",c:"Chanson"},{m:"Hotline Bling",c:"Chanson"},
+  {m:"Lose Yourself",c:"Chanson"},{m:"Stan",c:"Chanson"},{m:"Slim Shady",c:"Chanson"},
+  {m:"Without Me",c:"Chanson"},{m:"Not Afraid",c:"Chanson"},{m:"Love the Way You Lie",c:"Chanson"},
+  {m:"HUMBLE.",c:"Chanson"},{m:"DNA.",c:"Chanson"},{m:"Alright",c:"Chanson"},
+  {m:"Swimming Pools",c:"Chanson"},{m:"Money Trees",c:"Chanson"},
+  {m:"Powerless",c:"Chanson"},{m:"Stronger",c:"Chanson"},
+  {m:"Gold Digger",c:"Chanson"},{m:"Jesus Walks",c:"Chanson"},
+  {m:"Power",c:"Chanson"},{m:"All Falls Down",c:"Chanson"},
+  {m:"Fleur bleue",c:"Chanson"},{m:"Alors on danse",c:"Chanson"},
+  {m:"Papaoutai",c:"Chanson"},{m:"Formidable",c:"Chanson"},
+  {m:"Te quiero",c:"Chanson"},{m:"Ta fête",c:"Chanson"},
+  {m:"Défiler",c:"Chanson"},{m:"Fils de joie",c:"Chanson"},
+  {m:"Rocé - Par les damné.e.s",c:"Chanson"},{m:"Peur du noir",c:"Chanson"},
+  {m:"Nuit 17 à 52",c:"Chanson"},{m:"Futur proche",c:"Chanson"},
+  {m:"L'Odeur de l'essence",c:"Chanson"},{m:"La Quête",c:"Chanson"},
+  {m:"Tu me manques",c:"Chanson"},{m:"Dernière danse",c:"Chanson"},
+  {m:"Pompe à chaleur",c:"Chanson"},{m:"Peace or Violence",c:"Chanson"},
+  {m:"Intro",c:"Chanson"},{m:"Mojo",c:"Chanson"},
+  {m:"Bella",c:"Chanson"},{m:"La Fouine",c:"Artiste"},
+  {m:"Freeze Corleone",c:"Artiste"},{m:"Lomepal",c:"Artiste"},
+  {m:"Angèle",c:"Artiste"},{m:"Clara Luciani",c:"Artiste"},
+  {m:"Christine and the Queens",c:"Artiste"},{m:"Eddy de Pretto",c:"Artiste"},
+  {m:"Julien Doré",c:"Artiste"},{m:"Vianney",c:"Artiste"},
+  {m:"Zaz",c:"Artiste"},{m:"Pomme",c:"Artiste"},{m:"Suzane",c:"Artiste"},
+  {m:"Grand Corps Malade",c:"Artiste"},{m:"Bigflo & Oli",c:"Artiste"},
+  {m:"Nekfeu",c:"Artiste"},{m:"SCH",c:"Artiste"},{m:"Hamza",c:"Artiste"},
+  {m:"Damso",c:"Artiste"},{m:"Ninho",c:"Artiste"},{m:"Aya Nakamura",c:"Artiste"},
+  {m:"Dua Lipa",c:"Artiste"},{m:"Billie Eilish",c:"Artiste"},{m:"Olivia Rodrigo",c:"Artiste"},
+  {m:"Sabrina Carpenter",c:"Artiste"},{m:"Charli XCX",c:"Artiste"},{m:"Lana Del Rey",c:"Artiste"},
+  {m:"The Weeknd",c:"Artiste"},{m:"Post Malone",c:"Artiste"},{m:"Travis Scott",c:"Artiste"},
+  {m:"Tyler the Creator",c:"Artiste"},{m:"Frank Ocean",c:"Artiste"},{m:"Kendrick Lamar",c:"Artiste"},
+  {m:"J. Cole",c:"Artiste"},{m:"21 Savage",c:"Artiste"},{m:"Cardi B",c:"Artiste"},
+  {m:"Nicki Minaj",c:"Artiste"},{m:"Megan Thee Stallion",c:"Artiste"},
+  {m:"Doja Cat",c:"Artiste"},{m:"SZA",c:"Artiste"},{m:"H.E.R.",c:"Artiste"},
+  {m:"Lizzo",c:"Artiste"},{m:"Adele",c:"Artiste"},{m:"Ed Sheeran",c:"Artiste"},
+  {m:"Harry Styles",c:"Artiste"},{m:"Shawn Mendes",c:"Artiste"},
+  {m:"Justin Bieber",c:"Artiste"},{m:"Ariana Grande",c:"Artiste"},
+  {m:"Selena Gomez",c:"Artiste"},{m:"Miley Cyrus",c:"Artiste"},
+  {m:"Katy Perry",c:"Artiste"},{m:"Lady Gaga",c:"Artiste"},
+  {m:"P!nk",c:"Artiste"},{m:"Kesha",c:"Artiste"},{m:"Meghan Trainor",c:"Artiste"},
+  {m:"Coldplay",c:"Groupe"},{m:"Imagine Dragons",c:"Groupe"},{m:"Twenty One Pilots",c:"Groupe"},
+  {m:"Panic! at the Disco",c:"Groupe"},{m:"Fall Out Boy",c:"Groupe"},
+  {m:"My Chemical Romance",c:"Groupe"},{m:"Green Day",c:"Groupe"},
+  {m:"Linkin Park",c:"Groupe"},{m:"Radiohead",c:"Groupe"},{m:"Muse",c:"Groupe"},
+  {m:"Arctic Monkeys",c:"Groupe"},{m:"The Strokes",c:"Groupe"},{m:"The Killers",c:"Groupe"},
+  {m:"Blur",c:"Groupe"},{m:"Oasis",c:"Groupe"},{m:"Daft Punk",c:"Groupe"},
+  {m:"Justice",c:"Groupe"},{m:"Air",c:"Groupe"},{m:"Cassius",c:"Groupe"},
+  {m:"Phoenix",c:"Groupe"},{m:"Breakbot",c:"Artiste"},{m:"Kavinsky",c:"Artiste"},
+  {m:"Gesaffelstein",c:"Artiste"},{m:"Madeon",c:"Artiste"},{m:"Petit Biscuit",c:"Artiste"},
+  {m:"Martin Garrix",c:"Artiste"},{m:"Marshmello",c:"Artiste"},{m:"Diplo",c:"Artiste"},
+  {m:"Skrillex",c:"Artiste"},{m:"Deadmau5",c:"Artiste"},{m:"Avicii",c:"Artiste"},
+  {m:"David Guetta",c:"Artiste"},{m:"Calvin Harris",c:"Artiste"},{m:"Kygo",c:"Artiste"},
+  {m:"DJ Snake",c:"Artiste"},{m:"Major Lazer",c:"Groupe"},{m:"Disclosure",c:"Groupe"},
+  // Célébrités & Personnages
+  {m:"Elon Musk",c:"Célébrité"},{m:"Bill Gates",c:"Célébrité"},{m:"Steve Jobs",c:"Célébrité"},
+  {m:"Mark Zuckerberg",c:"Célébrité"},{m:"Jeff Bezos",c:"Célébrité"},
+  {m:"Obama",c:"Célébrité"},{m:"Macron",c:"Célébrité"},{m:"Mandela",c:"Célébrité"},
+  {m:"Einstein",c:"Célébrité"},{m:"Darwin",c:"Célébrité"},{m:"Picasso",c:"Célébrité"},
+  {m:"Leonardo da Vinci",c:"Célébrité"},{m:"Marie Curie",c:"Célébrité"},
+  {m:"Christophe Colomb",c:"Histoire"},{m:"Napoléon",c:"Histoire"},
+  {m:"Jeanne d'Arc",c:"Histoire"},{m:"Jules César",c:"Histoire"},
+  {m:"Alexandre le Grand",c:"Histoire"},{m:"Cléopâtre",c:"Histoire"},
+  {m:"Charlemagne",c:"Histoire"},{m:"Louis XIV",c:"Histoire"},
+  {m:"Marie-Antoinette",c:"Histoire"},{m:"Robespierre",c:"Histoire"},
+  {m:"Victor Hugo",c:"Célébrité"},{m:"Molière",c:"Célébrité"},
+  {m:"Voltaire",c:"Célébrité"},{m:"Rousseau",c:"Célébrité"},
+  {m:"Simone de Beauvoir",c:"Célébrité"},{m:"Simone Veil",c:"Célébrité"},
+  {m:"Coluche",c:"Célébrité"},{m:"De Funès",c:"Célébrité"},
+  {m:"Gérard Depardieu",c:"Célébrité"},{m:"Jean Dujardin",c:"Célébrité"},
+  {m:"Omar Sy",c:"Célébrité"},{m:"Vincent Cassel",c:"Célébrité"},
+  {m:"Marion Cotillard",c:"Célébrité"},{m:"Audrey Tautou",c:"Célébrité"},
+  {m:"Brigitte Bardot",c:"Célébrité"},{m:"Catherine Deneuve",c:"Célébrité"},
+  {m:"Cristiano Ronaldo",c:"Célébrité"},{m:"Lionel Messi",c:"Célébrité"},
+  {m:"Kylian Mbappé",c:"Célébrité"},{m:"Neymar",c:"Célébrité"},
+  {m:"Zlatan Ibrahimović",c:"Célébrité"},{m:"Karim Benzema",c:"Célébrité"},
+  {m:"Thierry Henry",c:"Célébrité"},{m:"Zinédine Zidane",c:"Célébrité"},
+  {m:"LeBron James",c:"Célébrité"},{m:"Michael Jordan",c:"Célébrité"},
+  {m:"Stephen Curry",c:"Célébrité"},{m:"Giannis Antetokounmpo",c:"Célébrité"},
+  {m:"Serena Williams",c:"Célébrité"},{m:"Roger Federer",c:"Célébrité"},
+  {m:"Rafael Nadal",c:"Célébrité"},{m:"Novak Djokovic",c:"Célébrité"},
+  {m:"Usain Bolt",c:"Célébrité"},{m:"Carl Lewis",c:"Célébrité"},
+  {m:"Mohammed Ali",c:"Célébrité"},{m:"Mike Tyson",c:"Célébrité"},
+  {m:"Conor McGregor",c:"Célébrité"},{m:"Ronda Rousey",c:"Célébrité"},
+  {m:"Tony Parker",c:"Célébrité"},{m:"Teddy Riner",c:"Célébrité"},
+  {m:"Spider-Man",c:"Personnage"},{m:"Batman",c:"Personnage"},
+  {m:"Superman",c:"Personnage"},{m:"Iron Man",c:"Personnage"},
+  {m:"Captain America",c:"Personnage"},{m:"Thor",c:"Personnage"},
+  {m:"Hulk",c:"Personnage"},{m:"Black Widow",c:"Personnage"},
+  {m:"Hawkeye",c:"Personnage"},{m:"Ant-Man",c:"Personnage"},
+  {m:"Doctor Strange",c:"Personnage"},{m:"Black Panther",c:"Personnage"},
+  {m:"Thanos",c:"Personnage"},{m:"Loki",c:"Personnage"},{m:"Deadpool",c:"Personnage"},
+  {m:"Wolverine",c:"Personnage"},{m:"Magneto",c:"Personnage"},{m:"Professor X",c:"Personnage"},
+  {m:"Wonder Woman",c:"Personnage"},{m:"Aquaman",c:"Personnage"},
+  {m:"The Flash",c:"Personnage"},{m:"Green Lantern",c:"Personnage"},
+  {m:"Joker",c:"Personnage"},{m:"Harley Quinn",c:"Personnage"},
+  {m:"Lex Luthor",c:"Personnage"},{m:"Bane",c:"Personnage"},
+  {m:"Hermione Granger",c:"Personnage"},{m:"Dumbledore",c:"Personnage"},
+  {m:"Voldemort",c:"Personnage"},{m:"Severus Snape",c:"Personnage"},
+  {m:"Sherlock Holmes",c:"Personnage"},{m:"James Bond",c:"Personnage"},
+  {m:"Indiana Jones",c:"Personnage"},{m:"Jack Sparrow",c:"Personnage"},
+  {m:"Hannibal Lecter",c:"Personnage"},{m:"Norman Bates",c:"Personnage"},
+  {m:"Walter White",c:"Personnage"},{m:"Jesse Pinkman",c:"Personnage"},
+  {m:"Tony Soprano",c:"Personnage"},{m:"Don Draper",c:"Personnage"},
+  {m:"Frank Underwood",c:"Personnage"},{m:"Tyrion Lannister",c:"Personnage"},
+  {m:"Jon Snow",c:"Personnage"},{m:"Daenerys Targaryen",c:"Personnage"},
+  {m:"Arya Stark",c:"Personnage"},{m:"Cersei Lannister",c:"Personnage"},
+  {m:"Frodo",c:"Personnage"},{m:"Gandalf",c:"Personnage"},
+  {m:"Aragorn",c:"Personnage"},{m:"Legolas",c:"Personnage"},
+  {m:"Gollum",c:"Personnage"},{m:"Sauron",c:"Personnage"},
+  {m:"Luke Skywalker",c:"Personnage"},{m:"Darth Vader",c:"Personnage"},
+  {m:"Han Solo",c:"Personnage"},{m:"Yoda",c:"Personnage"},
+  {m:"Obi-Wan Kenobi",c:"Personnage"},{m:"Rey",c:"Personnage"},
+  {m:"Kylo Ren",c:"Personnage"},{m:"Mandalorian",c:"Personnage"},
+  {m:"Pikachu",c:"Personnage"},{m:"Charizard",c:"Personnage"},
+  {m:"Mewtwo",c:"Personnage"},{m:"Gengar",c:"Personnage"},
+  {m:"Mickey Mouse",c:"Personnage"},{m:"Donald Duck",c:"Personnage"},
+  {m:"Goofy",c:"Personnage"},{m:"Minnie",c:"Personnage"},
+  {m:"Bugs Bunny",c:"Personnage"},{m:"Daffy Duck",c:"Personnage"},
+  {m:"Tweety",c:"Personnage"},{m:"Sylvester",c:"Personnage"},
+  {m:"Tom",c:"Personnage"},{m:"Jerry",c:"Personnage"},
+  {m:"Scooby-Doo",c:"Personnage"},{m:"Shaggy",c:"Personnage"},
+  {m:"Homer Simpson",c:"Personnage"},{m:"Bart Simpson",c:"Personnage"},
+  {m:"Lisa Simpson",c:"Personnage"},{m:"Marge Simpson",c:"Personnage"},
+  {m:"Cartman",c:"Personnage"},{m:"Kenny",c:"Personnage"},
+  {m:"Peter Griffin",c:"Personnage"},{m:"Stewie Griffin",c:"Personnage"},
+  {m:"Futurama Fry",c:"Personnage"},{m:"Bender",c:"Personnage"},
+  {m:"Rick Sanchez",c:"Personnage"},{m:"Morty Smith",c:"Personnage"},
+  {m:"Bob l'éponge",c:"Personnage"},{m:"Patrick Star",c:"Personnage"},
+  {m:"Sandy Cheeks",c:"Personnage"},{m:"Squidward",c:"Personnage"},
+  // Marques & Tech
+  {m:"iPhone",c:"Produit"},{m:"AirPods",c:"Produit"},{m:"Apple Watch",c:"Produit"},
+  {m:"MacBook",c:"Produit"},{m:"iPad",c:"Produit"},{m:"iMac",c:"Produit"},
+  {m:"Samsung Galaxy",c:"Produit"},{m:"PlayStation 5",c:"Produit"},
+  {m:"Nintendo Switch",c:"Produit"},{m:"Xbox Series X",c:"Produit"},
+  {m:"Meta Quest",c:"Produit"},{m:"GoPro",c:"Produit"},
+  {m:"Tesla",c:"Marque"},{m:"Ferrari",c:"Marque"},{m:"Lamborghini",c:"Marque"},
+  {m:"Porsche",c:"Marque"},{m:"Rolls-Royce",c:"Marque"},{m:"Bugatti",c:"Marque"},
+  {m:"Aston Martin",c:"Marque"},{m:"Maserati",c:"Marque"},{m:"Bentley",c:"Marque"},
+  {m:"McLaren",c:"Marque"},{m:"Koenigsegg",c:"Marque"},{m:"Pagani",c:"Marque"},
+  {m:"Snapchat",c:"Réseau social"},{m:"Instagram",c:"Réseau social"},
+  {m:"TikTok",c:"Réseau social"},{m:"Twitter / X",c:"Réseau social"},
+  {m:"LinkedIn",c:"Réseau social"},{m:"Reddit",c:"Réseau social"},
+  {m:"Pinterest",c:"Réseau social"},{m:"BeReal",c:"Réseau social"},
+  {m:"YouTube",c:"Plateforme"},{m:"Twitch",c:"Plateforme"},
+  {m:"Spotify",c:"Plateforme"},{m:"Netflix",c:"Plateforme"},
+  {m:"Amazon Prime",c:"Plateforme"},{m:"Disney+",c:"Plateforme"},
+  {m:"HBO Max",c:"Plateforme"},{m:"Apple TV+",c:"Plateforme"},
+  {m:"Uber",c:"Service"},{m:"Uber Eats",c:"Service"},{m:"Airbnb",c:"Service"},
+  {m:"Deliveroo",c:"Service"},{m:"Leboncoin",c:"Service"},{m:"Vinted",c:"Service"},
+  {m:"Doctolib",c:"Service"},{m:"Blablacar",c:"Service"},{m:"ManoMano",c:"Service"},
+  {m:"Duolingo",c:"Application"},{m:"Shazam",c:"Application"},{m:"Tinder",c:"Application"},
+  {m:"Bumble",c:"Application"},{m:"Hinge",c:"Application"},
+  {m:"ChatGPT",c:"Technologie"},{m:"Wikipedia",c:"Service"},
+  {m:"Google Maps",c:"Application"},{m:"Google Translate",c:"Application"},
+  {m:"Amazon",c:"Plateforme"},{m:"eBay",c:"Plateforme"},{m:"Wish",c:"Plateforme"},
+  {m:"Zalando",c:"Plateforme"},{m:"ASOS",c:"Marque"},{m:"Zara",c:"Marque"},
+  {m:"H&M",c:"Marque"},{m:"Uniqlo",c:"Marque"},{m:"Primark",c:"Marque"},
+  {m:"Nike",c:"Marque"},{m:"Adidas",c:"Marque"},{m:"Puma",c:"Marque"},
+  {m:"New Balance",c:"Marque"},{m:"Converse",c:"Marque"},{m:"Vans",c:"Marque"},
+  {m:"Supreme",c:"Marque"},{m:"Off-White",c:"Marque"},{m:"Balenciaga",c:"Marque"},
+  {m:"Gucci",c:"Marque"},{m:"Louis Vuitton",c:"Marque"},{m:"Chanel",c:"Marque"},
+  {m:"Hermès",c:"Marque"},{m:"Dior",c:"Marque"},{m:"Yves Saint Laurent",c:"Marque"},
+  {m:"Versace",c:"Marque"},{m:"Prada",c:"Marque"},{m:"Armani",c:"Marque"},
+  {m:"Rolex",c:"Marque"},{m:"Omega",c:"Marque"},{m:"Cartier",c:"Marque"},
+  {m:"IKEA",c:"Marque"},{m:"McDonald's",c:"Marque"},{m:"Starbucks",c:"Marque"},
+  {m:"KFC",c:"Marque"},{m:"Burger King",c:"Marque"},{m:"Subway",c:"Marque"},
+  {m:"Domino's",c:"Marque"},{m:"Five Guys",c:"Marque"},{m:"Chipotle",c:"Marque"},
+  {m:"Nespresso",c:"Marque"},{m:"Dyson",c:"Marque"},{m:"Roomba",c:"Produit"},
+  // Lieux
+  {m:"Tour Eiffel",c:"Lieu"},{m:"Louvre",c:"Lieu"},{m:"Sacré-Cœur",c:"Lieu"},
+  {m:"Château de Versailles",c:"Lieu"},{m:"Mont-Saint-Michel",c:"Lieu"},
+  {m:"Côte d'Azur",c:"Lieu"},{m:"Gorges du Verdon",c:"Lieu"},{m:"Dune du Pilat",c:"Lieu"},
+  {m:"Colisée de Rome",c:"Lieu"},{m:"Colosseum",c:"Lieu"},{m:"Vatican",c:"Lieu"},
+  {m:"Sagrada Família",c:"Lieu"},{m:"Parc Güell",c:"Lieu"},{m:"La Rambla",c:"Lieu"},
+  {m:"Big Ben",c:"Lieu"},{m:"Buckingham Palace",c:"Lieu"},{m:"Tower Bridge",c:"Lieu"},
+  {m:"Statue de la Liberté",c:"Lieu"},{m:"Empire State Building",c:"Lieu"},
+  {m:"Times Square",c:"Lieu"},{m:"Central Park",c:"Lieu"},{m:"Brooklyn Bridge",c:"Lieu"},
+  {m:"Golden Gate",c:"Lieu"},{m:"Hollywood",c:"Lieu"},{m:"Las Vegas",c:"Lieu"},
+  {m:"Grand Canyon",c:"Lieu"},{m:"Niagara Falls",c:"Lieu"},{m:"Yellowstone",c:"Lieu"},
+  {m:"Machu Picchu",c:"Lieu"},{m:"Angkor Vat",c:"Lieu"},{m:"Petra",c:"Lieu"},
+  {m:"Pyramides de Gizeh",c:"Lieu"},{m:"Grande Muraille de Chine",c:"Lieu"},
+  {m:"Taj Mahal",c:"Lieu"},{m:"Burj Khalifa",c:"Lieu"},{m:"Palm Jumeirah",c:"Lieu"},
+  {m:"Stonehenge",c:"Lieu"},{m:"Acropole d'Athènes",c:"Lieu"},{m:"Parthenon",c:"Lieu"},
+  {m:"Mont Fuji",c:"Lieu"},{m:"Everest",c:"Lieu"},{m:"Kilimandjaro",c:"Lieu"},
+  {m:"Sahara",c:"Lieu"},{m:"Amazonie",c:"Lieu"},{m:"Antarctique",c:"Lieu"},
+  {m:"Galápagos",c:"Lieu"},{m:"Maldives",c:"Lieu"},{m:"Bali",c:"Lieu"},
+  {m:"Ibiza",c:"Lieu"},{m:"Mykonos",c:"Lieu"},{m:"Santorini",c:"Lieu"},
+  {m:"Amalfi",c:"Lieu"},{m:"Monaco",c:"Lieu"},{m:"Saint-Tropez",c:"Lieu"},
+  {m:"Courchevel",c:"Lieu"},{m:"Chamonix",c:"Lieu"},{m:"Méribel",c:"Lieu"},
+  {m:"Tokyo",c:"Lieu"},{m:"Osaka",c:"Lieu"},{m:"Kyoto",c:"Lieu"},
+  {m:"New York",c:"Lieu"},{m:"Londres",c:"Lieu"},{m:"Paris",c:"Lieu"},
+  {m:"Barcelone",c:"Lieu"},{m:"Rome",c:"Lieu"},{m:"Amsterdam",c:"Lieu"},
+  {m:"Berlin",c:"Lieu"},{m:"Prague",c:"Lieu"},{m:"Budapest",c:"Lieu"},
+  {m:"Lisbonne",c:"Lieu"},{m:"Porto",c:"Lieu"},{m:"Séville",c:"Lieu"},
+  {m:"Marrakech",c:"Lieu"},{m:"Dubaï",c:"Lieu"},{m:"Singapour",c:"Lieu"},
+  {m:"Sydney",c:"Lieu"},{m:"Melbourne",c:"Lieu"},{m:"Rio de Janeiro",c:"Lieu"},
+  {m:"Buenos Aires",c:"Lieu"},{m:"Mexico City",c:"Lieu"},{m:"La Havane",c:"Lieu"},
+  // Événements & Activités
+  {m:"Coupe du Monde",c:"Événement"},{m:"Jeux Olympiques",c:"Événement"},
+  {m:"Roland-Garros",c:"Événement"},{m:"Tour de France",c:"Événement"},
+  {m:"Festival de Cannes",c:"Événement"},{m:"Wimbledon",c:"Événement"},
+  {m:"Super Bowl",c:"Événement"},{m:"Ligue des Champions",c:"Événement"},
+  {m:"NBA Finals",c:"Événement"},{m:"Grammy Awards",c:"Événement"},
+  {m:"Oscar",c:"Événement"},{m:"Globes d'Or",c:"Événement"},
+  {m:"Eurovision",c:"Événement"},{m:"Coachella",c:"Événement"},
+  {m:"Burning Man",c:"Événement"},{m:"Tomorrowland",c:"Événement"},
+  {m:"Halloween",c:"Fête"},{m:"Carnaval",c:"Fête"},{m:"Nouvel An",c:"Fête"},
+  {m:"Saint-Valentin",c:"Fête"},{m:"Black Friday",c:"Événement"},
+  {m:"Escape game",c:"Activité"},{m:"Karaoké",c:"Activité"},
+  {m:"Laser game",c:"Activité"},{m:"Paintball",c:"Activité"},
+  {m:"Bowling",c:"Activité"},{m:"Billard",c:"Activité"},{m:"Fléchettes",c:"Activité"},
+  {m:"Pétanque",c:"Sport"},{m:"Pongiste",c:"Sport"},{m:"Badminton",c:"Sport"},
+  {m:"Tennis de table",c:"Sport"},{m:"Squash",c:"Sport"},{m:"Padel",c:"Sport"},
+  {m:"Escalade",c:"Sport"},{m:"Parapente",c:"Sport"},{m:"Kitesurf",c:"Sport"},
+  {m:"Surf",c:"Sport"},{m:"Snowboard",c:"Sport"},{m:"Ski",c:"Sport"},
+  {m:"Bungee jumping",c:"Sport extrême"},{m:"Wingsuit",c:"Sport extrême"},
+  {m:"Base jump",c:"Sport extrême"},{m:"Skateboard",c:"Sport"},{m:"BMX",c:"Sport"},
+  {m:"Breakdance",c:"Danse"},{m:"Twerk",c:"Danse"},{m:"Salsa",c:"Danse"},
+  {m:"Bachata",c:"Danse"},{m:"Kizomba",c:"Danse"},{m:"Zouk",c:"Danse"},
+  {m:"Macarena",c:"Danse"},{m:"Harlem Shake",c:"Phénomène"},
+  {m:"Ice Bucket Challenge",c:"Phénomène"},{m:"Mannequin Challenge",c:"Phénomène"},
+  {m:"Planking",c:"Phénomène"},{m:"Bottle Cap Challenge",c:"Phénomène"},
+  {m:"Yoga",c:"Activité"},{m:"Méditation",c:"Activité"},{m:"Pilates",c:"Activité"},
+  {m:"CrossFit",c:"Sport"},{m:"Zumba",c:"Activité"},{m:"Boxe",c:"Sport"},
+  {m:"MMA",c:"Sport"},{m:"Judo",c:"Sport"},{m:"Karaté",c:"Sport"},
+  {m:"Taekwondo",c:"Sport"},{m:"Kung Fu",c:"Sport"},{m:"Capoeira",c:"Sport"},
+  {m:"Rooftop",c:"Lieu"},{m:"Food truck",c:"Concept"},{m:"Pop-up store",c:"Concept"},
+  {m:"Afterwork",c:"Activité"},{m:"Apéro dinatoire",c:"Activité"},
+  {m:"Brunch",c:"Repas"},{m:"Pique-nique",c:"Activité"},{m:"Barbecue",c:"Activité"},
+  {m:"Soirée jeux",c:"Activité"},{m:"Soirée pyjama",c:"Activité"},
+  {m:"Road trip",c:"Activité"},{m:"Camping",c:"Activité"},
+  {m:"Camping festival",c:"Activité"},{m:"Glamping",c:"Activité"},
+  {m:"Staycation",c:"Activité"},{m:"Workation",c:"Concept"},
+  // BD & Livres
+  {m:"Astérix",c:"BD"},{m:"Lucky Luke",c:"BD"},{m:"Tintin",c:"BD"},
+  {m:"Gaston Lagaffe",c:"BD"},{m:"Les Schtroumpfs",c:"BD"},{m:"Iznogoud",c:"BD"},
+  {m:"Spirou et Fantasio",c:"BD"},{m:"Blake et Mortimer",c:"BD"},
+  {m:"Le Petit Prince",c:"Livre"},{m:"L'Étranger",c:"Livre"},{m:"1984",c:"Livre"},
+  {m:"Brave New World",c:"Livre"},{m:"Fahrenheit 451",c:"Livre"},
+  {m:"Harry Potter",c:"Livre"},{m:"Le Seigneur des Anneaux",c:"Livre"},
+  {m:"Dune",c:"Livre"},{m:"Hunger Games",c:"Livre"},{m:"Divergente",c:"Livre"},
+  {m:"Twilight",c:"Livre"},{m:"Da Vinci Code",c:"Livre"},
+  {m:"Cinquante nuances de Grey",c:"Livre"},{m:"Fifty Shades Freed",c:"Livre"},
+  {m:"Game of Thrones",c:"Livre"},{m:"Outlander",c:"Livre"},
+  {m:"Don Quichotte",c:"Livre"},{m:"Moby Dick",c:"Livre"},
+  {m:"Dracula",c:"Livre"},{m:"Frankenstein",c:"Livre"},{m:"Le Portrait de Dorian Gray",c:"Livre"},
+  {m:"Sherlock Holmes",c:"Livre"},{m:"Les Misérables",c:"Livre"},
+  {m:"Notre-Dame de Paris",c:"Livre"},{m:"Germinal",c:"Livre"},
+  {m:"Madame Bovary",c:"Livre"},{m:"Guerre et Paix",c:"Livre"},
+  {m:"Crime et Châtiment",c:"Livre"},{m:"Le Procès",c:"Livre"},
+  {m:"L'Odyssée",c:"Livre"},{m:"L'Iliade",c:"Livre"},
 ];
 
-let teams = [];
-let scores = {};
-let currentTeamIdx = 0;
-let playersSetupIdx = 0;
-let usedWords = new Set();
-let currentWord = null;
+let teams=[], scores={}, currentTeamIdx=0, playersSetupIdx=0;
+let used=new Set(), currentWord=null, wordCount=0;
 
-function show(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
+  window.scrollTo(0,0);
 }
-function showErr(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-function hideErr(id) {
-  document.getElementById(id).style.display = 'none';
-}
+function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';}
+function hideErr(id){document.getElementById(id).style.display='none';}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-function addTeam() {
-  const inp = document.getElementById('inp-team');
-  const name = inp.value.trim();
-  if (!name) return;
-  if (teams.find(t => t.name.toLowerCase() === name.toLowerCase())) {
-    showErr('err-setup', 'Ce nom existe déjà.');
-    return;
-  }
+function addTeam(){
+  const inp=document.getElementById('inp-team');
+  const name=inp.value.trim();
+  if(!name)return;
+  if(teams.find(t=>t.name.toLowerCase()===name.toLowerCase())){showErr('err-setup','Ce nom existe déjà.');return;}
   hideErr('err-setup');
-  teams.push({ name, p1: '', p2: '' });
-  inp.value = '';
-  renderTeamsList();
+  teams.push({name,p1:'',p2:''});
+  inp.value='';
+  renderTeams();
 }
-
-function removeTeam(i) {
-  teams.splice(i, 1);
-  renderTeamsList();
-}
-
-function renderTeamsList() {
-  const el = document.getElementById('teams-list');
-  if (!teams.length) { el.innerHTML = ''; return; }
-  el.innerHTML = teams.map((t, i) => `
-    <div class="card" style="display:flex;align-items:center;gap:10px;padding:0.75rem 1rem">
+function removeTeam(i){teams.splice(i,1);renderTeams();}
+function renderTeams(){
+  const el=document.getElementById('teams-list');
+  if(!teams.length){el.innerHTML='';return;}
+  el.innerHTML=teams.map((t,i)=>`
+    <div class="card" style="display:flex;align-items:center;gap:10px;padding:.75rem 1rem">
       <div style="flex:1">
         <span style="font-weight:500">${esc(t.name)}</span>
-        ${t.p1 ? `<span style="font-size:13px;color:var(--muted);margin-left:8px">${esc(t.p1)} & ${esc(t.p2)}</span>` : ''}
+        ${t.p1?`<span style="font-size:13px;color:var(--muted);margin-left:8px">${esc(t.p1)} & ${esc(t.p2)}</span>`:''}
       </div>
-      <button onclick="removeTeam(${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:2px 6px;border-radius:8px" aria-label="Supprimer">✕</button>
-    </div>
-  `).join('');
+      <button onclick="removeTeam(${i})" style="background:none;border:none;cursor:pointer;color:var(--muted2);font-size:18px;padding:2px 6px;border-radius:8px;line-height:1">✕</button>
+    </div>`).join('');
 }
 
-function esc(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function startGame() {
-  if (teams.length < 2) { showErr('err-setup', 'Il faut au moins 2 équipes.'); return; }
+function startGame(){
+  if(teams.length<2){showErr('err-setup','Il faut au moins 2 équipes.');return;}
   hideErr('err-setup');
-  playersSetupIdx = 0;
+  playersSetupIdx=0;
   askPlayers(0);
 }
-
-function askPlayers(i) {
-  playersSetupIdx = i;
-  document.getElementById('players-team-name').textContent = teams[i].name;
-  document.getElementById('inp-p1').value = teams[i].p1 || '';
-  document.getElementById('inp-p2').value = teams[i].p2 || '';
+function askPlayers(i){
+  playersSetupIdx=i;
+  document.getElementById('players-team-name').textContent=teams[i].name;
+  document.getElementById('inp-p1').value=teams[i].p1||'';
+  document.getElementById('inp-p2').value=teams[i].p2||'';
   hideErr('err-players');
   show('screen-players');
-  setTimeout(() => document.getElementById('inp-p1').focus(), 100);
+  setTimeout(()=>document.getElementById('inp-p1').focus(),100);
 }
-
-function savePlayers() {
-  const p1 = document.getElementById('inp-p1').value.trim();
-  const p2 = document.getElementById('inp-p2').value.trim();
-  if (!p1 || !p2) { showErr('err-players', 'Les deux prénoms sont obligatoires.'); return; }
-  teams[playersSetupIdx].p1 = p1;
-  teams[playersSetupIdx].p2 = p2;
-  if (playersSetupIdx + 1 < teams.length) {
-    askPlayers(playersSetupIdx + 1);
-  } else {
-    initGame();
-  }
+function savePlayers(){
+  const p1=document.getElementById('inp-p1').value.trim();
+  const p2=document.getElementById('inp-p2').value.trim();
+  if(!p1||!p2){showErr('err-players','Les deux prénoms sont obligatoires.');return;}
+  teams[playersSetupIdx].p1=p1;teams[playersSetupIdx].p2=p2;
+  if(playersSetupIdx+1<teams.length){askPlayers(playersSetupIdx+1);}
+  else{initGame();}
 }
-
-function initGame() {
-  teams.forEach(t => scores[t.name] = 0);
-  currentTeamIdx = 0;
-  usedWords.clear();
+function initGame(){
+  teams.forEach(t=>scores[t.name]=0);
+  currentTeamIdx=0;used.clear();wordCount=0;
   show('screen-game');
-  renderScores();
-  startTurn();
+  renderScores();startTurn();
 }
-
-function renderScores() {
-  const row = document.getElementById('scores-row');
-  row.innerHTML = teams.map((t, i) => `
-    <div class="score-chip ${i === currentTeamIdx ? 'active' : ''}">
+function renderScores(){
+  document.getElementById('scores-wrap').innerHTML=teams.map((t,i)=>`
+    <div class="score-chip ${i===currentTeamIdx?'active':''}">
       <div class="num">${scores[t.name]}</div>
       <div class="lbl">${esc(t.name)}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
-
-function startTurn() {
-  const t = teams[currentTeamIdx];
-  document.getElementById('turn-info').innerHTML =
-    `<strong>${esc(t.name)}</strong> — ${esc(t.p1)} fait deviner à ${esc(t.p2)}`;
-  document.getElementById('phase-guess').style.display = 'block';
-  document.getElementById('phase-result').style.display = 'none';
-  pickWord();
-  renderBuzzGrid();
+function startTurn(){
+  const t=teams[currentTeamIdx];
+  document.getElementById('turn-info').innerHTML=`<strong>${esc(t.name)}</strong> — ${esc(t.p1)} fait deviner à ${esc(t.p2)}`;
+  document.getElementById('phase-guess').style.display='block';
+  document.getElementById('phase-result').style.display='none';
+  pickWord();renderBuzz();
 }
-
-function pickWord() {
-  const available = WORDS.filter(w => !usedWords.has(w.mot));
-  if (!available.length) usedWords.clear();
-  const pool = WORDS.filter(w => !usedWords.has(w.mot));
-  const w = pool[Math.floor(Math.random() * pool.length)];
-  currentWord = w;
-  usedWords.add(w.mot);
-  document.getElementById('word-main').textContent = w.mot;
-  document.getElementById('word-cat').innerHTML = `<span class="badge badge-category">${w.cat}</span>`;
+function pickWord(){
+  const pool=WORDS.filter(w=>!used.has(w.m));
+  if(!pool.length){used.clear();}
+  const avail=WORDS.filter(w=>!used.has(w.m));
+  const w=avail[Math.floor(Math.random()*avail.length)];
+  currentWord=w;used.add(w.m);wordCount++;
+  document.getElementById('word-main').textContent=w.m;
+  document.getElementById('word-cat').innerHTML=`<span class="word-cat">${w.c}</span>`;
+  document.getElementById('word-counter').textContent=`Mot n°${wordCount}`;
 }
-
-function renderBuzzGrid() {
-  const grid = document.getElementById('buzz-grid');
-  grid.innerHTML = teams.map((t, i) => `
-    <button class="buzz-btn ${i === currentTeamIdx ? 'is-active' : ''}" onclick="teamGuessed(${i})">
+function renderBuzz(){
+  document.getElementById('buzz-grid').innerHTML=teams.map((t,i)=>`
+    <button class="buzz-btn ${i===currentTeamIdx?'is-active':''}" onclick="teamGuessed(${i})">
       <div class="bname">${esc(t.name)}</div>
       <div class="bplayers">${esc(t.p1)} & ${esc(t.p2)}</div>
-    </button>
-  `).join('');
+    </button>`).join('');
 }
-
-function teamGuessed(idx) {
-  const active = teams[currentTeamIdx];
-  const guesser = teams[idx];
-  let emoji, msg;
-  if (idx === currentTeamIdx) {
-    scores[active.name]++;
-    emoji = '🎉';
-    msg = `<strong>${esc(active.name)}</strong> marque 1 point !`;
+function teamGuessed(idx){
+  const active=teams[currentTeamIdx],guesser=teams[idx];
+  let emoji,msg;
+  if(idx===currentTeamIdx){
+    scores[active.name]++;emoji='🎉';
+    msg=`<strong>${esc(active.name)}</strong> marque 1 point !`;
   } else {
-    scores[guesser.name]++;
-    emoji = '⚡';
-    msg = `<strong>${esc(guesser.name)}</strong> vole le point !`;
+    scores[guesser.name]++;emoji='⚡';
+    msg=`<strong>${esc(guesser.name)}</strong> vole le point !`;
   }
-  document.getElementById('phase-guess').style.display = 'none';
-  document.getElementById('result-emoji').textContent = emoji;
-  document.getElementById('result-msg').innerHTML = msg;
-  document.getElementById('phase-result').style.display = 'block';
+  document.getElementById('phase-guess').style.display='none';
+  document.getElementById('result-emoji').textContent=emoji;
+  document.getElementById('result-msg').innerHTML=msg;
+  document.getElementById('recap-word').textContent=currentWord.m;
+  document.getElementById('phase-result').style.display='block';
   renderScores();
 }
-
-function skipWord() {
-  pickWord();
+function skipWord(){pickWord();}
+function nextTurn(){
+  currentTeamIdx=(currentTeamIdx+1)%teams.length;
+  renderScores();startTurn();
 }
 
-function nextTurn() {
-  currentTeamIdx = (currentTeamIdx + 1) % teams.length;
-  renderScores();
-  startTurn();
-}
-
-document.getElementById('inp-team').addEventListener('keydown', e => { if (e.key === 'Enter') addTeam(); });
-document.getElementById('inp-p1').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-p2').focus(); });
-document.getElementById('inp-p2').addEventListener('keydown', e => { if (e.key === 'Enter') savePlayers(); });
+document.getElementById('inp-team').addEventListener('keydown',e=>{if(e.key==='Enter')addTeam();});
+document.getElementById('inp-p1').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inp-p2').focus();});
+document.getElementById('inp-p2').addEventListener('keydown',e=>{if(e.key==='Enter')savePlayers();});
 </script>
 </body>
 </html>
