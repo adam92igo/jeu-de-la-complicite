@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeu de la Complicité</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e0f;
+  --surface: #1a1a1c;
+  --surface2: #242426;
+  --border: rgba(255,255,255,0.08);
+  --accent: #f0e040;
+  --accent2: #ff6b35;
+  --text: #f5f5f0;
+  --muted: rgba(245,245,240,0.45);
+  --success: #4ade80;
+  --danger: #f87171;
+  --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.app {
+  width: 100%;
+  max-width: 560px;
+  padding: 2rem 1.25rem 4rem;
+  min-height: 100vh;
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2.5rem;
+}
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(28px, 6vw, 40px);
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+}
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 1rem;
+}
+p { font-size: 15px; color: var(--muted); line-height: 1.6; }
+.screen { display: none; }
+.screen.active { display: block; }
+
+input[type="text"] {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+input[type="text"]:focus { border-color: var(--accent); }
+input[type="text"]::placeholder { color: var(--muted); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #0e0e0f;
+  width: 100%;
+}
+.btn-primary:hover { background: #ffe800; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  flex: 1;
+}
+.btn-secondary:hover { background: var(--surface2); }
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  flex: 1;
+}
+.btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+.btn-add {
+  background: var(--surface2);
+  color: var(--accent);
+  border: 1px solid rgba(240,224,64,0.2);
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+.btn-add:hover { background: rgba(240,224,64,0.1); }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.5rem;
+}
+.error-msg {
+  font-size: 13px;
+  color: var(--danger);
+  margin: 0.5rem 0;
+  display: none;
+}
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.badge-category {
+  background: rgba(240,224,64,0.12);
+  color: var(--accent);
+  border: 1px solid rgba(240,224,64,0.2);
+}
+
+.scores-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.score-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem 0.875rem;
+  text-align: center;
+  flex: 1;
+  min-width: 80px;
+  transition: all 0.2s;
+}
+.score-chip.active {
+  background: rgba(240,224,64,0.1);
+  border-color: rgba(240,224,64,0.4);
+}
+.score-chip .num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--text);
+}
+.score-chip.active .num { color: var(--accent); }
+.score-chip .lbl {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+}
+
+.word-stage {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  margin: 1.25rem 0;
+  position: relative;
+  overflow: hidden;
+}
+.word-stage::before {
+  content: '';
+  position: absolute;
+  top: -40px; left: -40px;
+  width: 150px; height: 150px;
+  background: radial-gradient(circle, rgba(240,224,64,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.word-main {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(26px, 7vw, 42px);
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  line-height: 1.15;
+}
+.word-cat { font-size: 13px; color: var(--muted); }
+
+.turn-info {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  padding: 0.625rem 1rem;
+  background: var(--surface);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.turn-info strong { color: var(--accent); font-weight: 500; }
+
+.buzz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin: 1rem 0;
+}
+.buzz-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.875rem 0.75rem;
+  cursor: pointer;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  text-align: center;
+  transition: all 0.15s;
+}
+.buzz-btn:hover { background: var(--surface2); border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+.buzz-btn.is-active { background: rgba(240,224,64,0.1); border-color: rgba(240,224,64,0.4); }
+.buzz-btn .bname { font-weight: 500; font-size: 14px; }
+.buzz-btn .bplayers { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.result-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  margin: 1rem 0;
+}
+.result-box .big { font-size: 32px; margin-bottom: 0.5rem; }
+.result-box p { font-size: 15px; color: var(--text); }
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1.25rem 0;
+}
+.btn-row { display: flex; gap: 8px; }
+.section-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 0.625rem;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="logo">🎯 Complicité</div>
+
+  <!-- SETUP -->
+  <div id="screen-setup" class="screen active">
+    <h1>Le jeu de la<br><span style="color:var(--accent)">complicité</span></h1>
+    <p style="margin:0.75rem 0 2rem">Faites deviner des mots à votre partenaire grâce à vos expériences communes.</p>
+
+    <div class="section-label">Équipes</div>
+    <div id="teams-list"></div>
+
+    <div style="display:flex;gap:8px;margin-bottom:0.5rem">
+      <input type="text" id="inp-team" placeholder="Nom de l'équipe…" />
+      <button class="btn btn-add" onclick="addTeam()">+ Ajouter</button>
+    </div>
+    <div class="error-msg" id="err-setup"></div>
+
+    <div class="divider"></div>
+    <button class="btn btn-primary" onclick="startGame()">Lancer la partie →</button>
+  </div>
+
+  <!-- PLAYERS -->
+  <div id="screen-players" class="screen">
+    <p style="margin-bottom:0.375rem;font-size:13px;color:var(--muted)">Équipe</p>
+    <h2 id="players-team-name" style="margin-bottom:1.5rem"></h2>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:0.5rem">
+      <input type="text" id="inp-p1" placeholder="Prénom joueur 1" />
+      <input type="text" id="inp-p2" placeholder="Prénom joueur 2" />
+    </div>
+    <div class="error-msg" id="err-players"></div>
+    <div class="divider"></div>
+    <button class="btn btn-primary" onclick="savePlayers()">Suivant →</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="screen-game" class="screen">
+    <div class="scores-row" id="scores-row"></div>
+
+    <div class="turn-info" id="turn-info"></div>
+
+    <div class="word-stage" id="word-stage">
+      <div class="word-main" id="word-main">—</div>
+      <div class="word-cat" id="word-cat"></div>
+    </div>
+
+    <!-- Phase : deviner -->
+    <div id="phase-guess">
+      <p style="margin-bottom:0.75rem;font-size:14px">Qui a deviné le mot ?</p>
+      <div class="buzz-grid" id="buzz-grid"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="skipWord()">Passer ce mot</button>
+      </div>
+    </div>
+
+    <!-- Phase : résultat -->
+    <div id="phase-result" style="display:none">
+      <div class="result-box">
+        <div class="big" id="result-emoji"></div>
+        <p id="result-msg"></p>
+      </div>
+      <button class="btn btn-primary" onclick="nextTurn()">Tour suivant →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  {mot:"Nutella",cat:"Marque"},
+  {mot:"Le Roi Lion",cat:"Film"},
+  {mot:"Pokémon",cat:"Série / Jeu"},
+  {mot:"Harry Potter",cat:"Livre / Film"},
+  {mot:"iPhone",cat:"Produit"},
+  {mot:"McDonalds",cat:"Marque"},
+  {mot:"IKEA",cat:"Marque"},
+  {mot:"Netflix",cat:"Service"},
+  {mot:"Minecraft",cat:"Jeu vidéo"},
+  {mot:"Fortnite",cat:"Jeu vidéo"},
+  {mot:"TikTok",cat:"Réseau social"},
+  {mot:"Beyoncé",cat:"Célébrité"},
+  {mot:"Eiffel Tower",cat:"Lieu"},
+  {mot:"Disneyland",cat:"Lieu"},
+  {mot:"Airbus",cat:"Marque"},
+  {mot:"Croissant",cat:"Nourriture"},
+  {mot:"Sushi",cat:"Nourriture"},
+  {mot:"Pizza",cat:"Nourriture"},
+  {mot:"Ramen",cat:"Nourriture"},
+  {mot:"Tiramisu",cat:"Nourriture"},
+  {mot:"Hamburger",cat:"Nourriture"},
+  {mot:"Tacos",cat:"Nourriture"},
+  {mot:"Chocolat chaud",cat:"Boisson"},
+  {mot:"Starbucks",cat:"Marque"},
+  {mot:"Coca-Cola",cat:"Boisson"},
+  {mot:"Red Bull",cat:"Boisson"},
+  {mot:"Inception",cat:"Film"},
+  {mot:"Interstellar",cat:"Film"},
+  {mot:"Titanic",cat:"Film"},
+  {mot:"Pulp Fiction",cat:"Film"},
+  {mot:"Parasite",cat:"Film"},
+  {mot:"Avatar",cat:"Film"},
+  {mot:"Spider-Man",cat:"Personnage"},
+  {mot:"Batman",cat:"Personnage"},
+  {mot:"Iron Man",cat:"Personnage"},
+  {mot:"Hermione Granger",cat:"Personnage"},
+  {mot:"Sherlock Holmes",cat:"Personnage"},
+  {mot:"James Bond",cat:"Personnage"},
+  {mot:"Shrek",cat:"Personnage"},
+  {mot:"Pikachu",cat:"Personnage"},
+  {mot:"Mickey Mouse",cat:"Personnage"},
+  {mot:"Darth Vader",cat:"Personnage"},
+  {mot:"The Office",cat:"Série"},
+  {mot:"Breaking Bad",cat:"Série"},
+  {mot:"Game of Thrones",cat:"Série"},
+  {mot:"Stranger Things",cat:"Série"},
+  {mot:"La Casa de Papel",cat:"Série"},
+  {mot:"Friends",cat:"Série"},
+  {mot:"Squid Game",cat:"Série"},
+  {mot:"Peaky Blinders",cat:"Série"},
+  {mot:"Black Mirror",cat:"Série"},
+  {mot:"Narcos",cat:"Série"},
+  {mot:"Euphoria",cat:"Série"},
+  {mot:"The Last of Us",cat:"Jeu vidéo"},
+  {mot:"GTA V",cat:"Jeu vidéo"},
+  {mot:"FIFA",cat:"Jeu vidéo"},
+  {mot:"Call of Duty",cat:"Jeu vidéo"},
+  {mot:"League of Legends",cat:"Jeu vidéo"},
+  {mot:"Among Us",cat:"Jeu vidéo"},
+  {mot:"Super Mario",cat:"Jeu vidéo"},
+  {mot:"Tetris",cat:"Jeu vidéo"},
+  {mot:"Rollercoaster",cat:"Objet / Lieu"},
+  {mot:"Planche de surf",cat:"Objet"},
+  {mot:"Télescope",cat:"Objet"},
+  {mot:"Escalier roulant",cat:"Objet"},
+  {mot:"Distributeur automatique",cat:"Objet"},
+  {mot:"Casque VR",cat:"Objet"},
+  {mot:"Drone",cat:"Objet"},
+  {mot:"Parachute",cat:"Objet"},
+  {mot:"Igloo",cat:"Construction"},
+  {mot:"Gratte-ciel",cat:"Construction"},
+  {mot:"Arc-en-ciel",cat:"Nature"},
+  {mot:"Aurore boréale",cat:"Nature"},
+  {mot:"Volcan",cat:"Nature"},
+  {mot:"Iceberg",cat:"Nature"},
+  {mot:"Désert du Sahara",cat:"Lieu"},
+  {mot:"Amazonie",cat:"Lieu"},
+  {mot:"Vegas",cat:"Lieu"},
+  {mot:"Tokyo",cat:"Lieu"},
+  {mot:"New York",cat:"Lieu"},
+  {mot:"Barcelone",cat:"Lieu"},
+  {mot:"Ibiza",cat:"Lieu"},
+  {mot:"Bali",cat:"Lieu"},
+  {mot:"Dubai",cat:"Lieu"},
+  {mot:"Champs-Élysées",cat:"Lieu"},
+  {mot:"Mona Lisa",cat:"Œuvre"},
+  {mot:"Joconde",cat:"Œuvre"},
+  {mot:"Guernica",cat:"Œuvre"},
+  {mot:"Beethoven",cat:"Célébrité"},
+  {mot:"Mozart",cat:"Célébrité"},
+  {mot:"Michael Jackson",cat:"Célébrité"},
+  {mot:"Elvis Presley",cat:"Célébrité"},
+  {mot:"David Bowie",cat:"Célébrité"},
+  {mot:"Daft Punk",cat:"Groupe"},
+  {mot:"The Beatles",cat:"Groupe"},
+  {mot:"Eminem",cat:"Célébrité"},
+  {mot:"Kanye West",cat:"Célébrité"},
+  {mot:"Drake",cat:"Célébrité"},
+  {mot:"Taylor Swift",cat:"Célébrité"},
+  {mot:"Rihanna",cat:"Célébrité"},
+  {mot:"Stromae",cat:"Célébrité"},
+  {mot:"Jul",cat:"Célébrité"},
+  {mot:"Booba",cat:"Célébrité"},
+  {mot:"Maître Gims",cat:"Célébrité"},
+  {mot:"PNL",cat:"Groupe"},
+  {mot:"Orelsan",cat:"Célébrité"},
+  {mot:"Aya Nakamura",cat:"Célébrité"},
+  {mot:"Ninho",cat:"Célébrité"},
+  {mot:"Cristiano Ronaldo",cat:"Célébrité"},
+  {mot:"Lionel Messi",cat:"Célébrité"},
+  {mot:"Kylian Mbappé",cat:"Célébrité"},
+  {mot:"LeBron James",cat:"Célébrité"},
+  {mot:"Neymar",cat:"Célébrité"},
+  {mot:"Zlatan Ibrahimović",cat:"Célébrité"},
+  {mot:"Serena Williams",cat:"Célébrité"},
+  {mot:"Roger Federer",cat:"Célébrité"},
+  {mot:"Usain Bolt",cat:"Célébrité"},
+  {mot:"Michael Jordan",cat:"Célébrité"},
+  {mot:"Karim Benzema",cat:"Célébrité"},
+  {mot:"Tour de France",cat:"Événement"},
+  {mot:"Jeux Olympiques",cat:"Événement"},
+  {mot:"Coupe du Monde",cat:"Événement"},
+  {mot:"Roland-Garros",cat:"Événement"},
+  {mot:"Festival de Cannes",cat:"Événement"},
+  {mot:"Halloween",cat:"Fête"},
+  {mot:"Carnaval",cat:"Fête"},
+  {mot:"Nouvel An",cat:"Fête"},
+  {mot:"Saint-Valentin",cat:"Fête"},
+  {mot:"Black Friday",cat:"Événement"},
+  {mot:"Bouchon d'oreilles",cat:"Objet"},
+  {mot:"Post-it",cat:"Objet"},
+  {mot:"Scotch",cat:"Objet"},
+  {mot:"Trombone",cat:"Objet"},
+  {mot:"Stylo bille",cat:"Objet"},
+  {mot:"Règle",cat:"Objet"},
+  {mot:"Agrafeuse",cat:"Objet"},
+  {mot:"Souris d'ordinateur",cat:"Objet"},
+  {mot:"Clavier mécanique",cat:"Objet"},
+  {mot:"Webcam",cat:"Objet"},
+  {mot:"Chargeur USB-C",cat:"Objet"},
+  {mot:"AirPods",cat:"Produit"},
+  {mot:"Apple Watch",cat:"Produit"},
+  {mot:"PS5",cat:"Produit"},
+  {mot:"Nintendo Switch",cat:"Produit"},
+  {mot:"Tesla",cat:"Marque"},
+  {mot:"Ferrari",cat:"Marque"},
+  {mot:"Lamborghini",cat:"Marque"},
+  {mot:"Porsche",cat:"Marque"},
+  {mot:"Rolls-Royce",cat:"Marque"},
+  {mot:"Snapchat",cat:"Réseau social"},
+  {mot:"Instagram",cat:"Réseau social"},
+  {mot:"Twitter / X",cat:"Réseau social"},
+  {mot:"LinkedIn",cat:"Réseau social"},
+  {mot:"Reddit",cat:"Réseau social"},
+  {mot:"YouTube",cat:"Plateforme"},
+  {mot:"Twitch",cat:"Plateforme"},
+  {mot:"Spotify",cat:"Plateforme"},
+  {mot:"Amazon",cat:"Plateforme"},
+  {mot:"Uber",cat:"Service"},
+  {mot:"Airbnb",cat:"Service"},
+  {mot:"Deliveroo",cat:"Service"},
+  {mot:"Leboncoin",cat:"Service"},
+  {mot:"Vinted",cat:"Service"},
+  {mot:"Doctolib",cat:"Service"},
+  {mot:"Duolingo",cat:"Application"},
+  {mot:"ChatGPT",cat:"Technologie"},
+  {mot:"Wikipedia",cat:"Service"},
+  {mot:"Google Maps",cat:"Application"},
+  {mot:"Google Translate",cat:"Application"},
+  {mot:"Shazam",cat:"Application"},
+  {mot:"Tinder",cat:"Application"},
+  {mot:"Blague de tonton",cat:"Expression"},
+  {mot:"Soirée pyjama",cat:"Expérience"},
+  {mot:"Road trip",cat:"Expérience"},
+  {mot:"Camping",cat:"Expérience"},
+  {mot:"Escalade",cat:"Sport"},
+  {mot:"Parapente",cat:"Sport"},
+  {mot:"Kitesurf",cat:"Sport"},
+  {mot:"Ski nautique",cat:"Sport"},
+  {mot:"Escape game",cat:"Activité"},
+  {mot:"Karaoké",cat:"Activité"},
+  {mot:"Brunch",cat:"Repas"},
+  {mot:"Fondue savoyarde",cat:"Plat"},
+  {mot:"Raclette",cat:"Plat"},
+  {mot:"Kebab",cat:"Plat"},
+  {mot:"Naan",cat:"Plat"},
+  {mot:"Dim Sum",cat:"Plat"},
+  {mot:"Crêpe suzette",cat:"Plat"},
+  {mot:"Bubble tea",cat:"Boisson"},
+  {mot:"Matcha latte",cat:"Boisson"},
+  {mot:"Kombucha",cat:"Boisson"},
+  {mot:"Limoncello",cat:"Boisson"},
+  {mot:"Sangria",cat:"Boisson"},
+  {mot:"Mojito",cat:"Cocktail"},
+  {mot:"Tequila sunrise",cat:"Cocktail"},
+  {mot:"Détective Conan",cat:"Manga / Anime"},
+  {mot:"Naruto",cat:"Anime"},
+  {mot:"Dragon Ball Z",cat:"Anime"},
+  {mot:"One Piece",cat:"Anime"},
+  {mot:"Attack on Titan",cat:"Anime"},
+  {mot:"Death Note",cat:"Anime"},
+  {mot:"Sailor Moon",cat:"Anime"},
+  {mot:"Akira",cat:"Film / Manga"},
+  {mot:"Ghost in the Shell",cat:"Film"},
+  {mot:"Studio Ghibli",cat:"Studio"},
+  {mot:"Mon voisin Totoro",cat:"Film"},
+  {mot:"Spirited Away",cat:"Film"},
+  {mot:"Le Château ambulant",cat:"Film"},
+  {mot:"Kiki la petite sorcière",cat:"Film"},
+  {mot:"Wallace et Gromit",cat:"Personnage"},
+  {mot:"Tom et Jerry",cat:"Série animée"},
+  {mot:"Scooby-Doo",cat:"Série animée"},
+  {mot:"Les Simpson",cat:"Série animée"},
+  {mot:"South Park",cat:"Série animée"},
+  {mot:"Family Guy",cat:"Série animée"},
+  {mot:"Bob l'éponge",cat:"Série animée"},
+  {mot:"Futurama",cat:"Série animée"},
+  {mot:"Rick and Morty",cat:"Série animée"},
+  {mot:"Arcane",cat:"Série animée"},
+  {mot:"Gravity Falls",cat:"Série animée"},
+  {mot:"Avatar : le dernier maître de l'air",cat:"Série animée"},
+  {mot:"Cowboy Bebop",cat:"Anime"},
+  {mot:"Fullmetal Alchemist",cat:"Anime"},
+  {mot:"Sword Art Online",cat:"Anime"},
+  {mot:"Demon Slayer",cat:"Anime"},
+  {mot:"Jujutsu Kaisen",cat:"Anime"},
+  {mot:"My Hero Academia",cat:"Anime"},
+  {mot:"Hunter x Hunter",cat:"Anime"},
+  {mot:"Neon Genesis Evangelion",cat:"Anime"},
+  {mot:"Bleach",cat:"Anime"},
+  {mot:"Fairy Tail",cat:"Anime"},
+  {mot:"Boruto",cat:"Anime"},
+  {mot:"Chainsaw Man",cat:"Manga / Anime"},
+  {mot:"Spy x Family",cat:"Manga / Anime"},
+  {mot:"The Boys",cat:"Série"},
+  {mot:"Succession",cat:"Série"},
+  {mot:"Severance",cat:"Série"},
+  {mot:"Ted Lasso",cat:"Série"},
+  {mot:"White Lotus",cat:"Série"},
+  {mot:"Ozark",cat:"Série"},
+  {mot:"Chernobyl",cat:"Mini-série"},
+  {mot:"House of the Dragon",cat:"Série"},
+  {mot:"The Crown",cat:"Série"},
+  {mot:"Wednesday",cat:"Série"},
+  {mot:"Emily in Paris",cat:"Série"},
+  {mot:"Elite",cat:"Série"},
+  {mot:"Dark",cat:"Série"},
+  {mot:"Lupin",cat:"Série"},
+  {mot:"Kaamelott",cat:"Série"},
+  {mot:"Engrenages",cat:"Série"},
+  {mot:"Dix pour cent",cat:"Série"},
+  {mot:"Baron Noir",cat:"Série"},
+  {mot:"Intouchables",cat:"Film"},
+  {mot:"Amélie Poulain",cat:"Film"},
+  {mot:"Le Dîner de cons",cat:"Film"},
+  {mot:"Les Choristes",cat:"Film"},
+  {mot:"Bienvenue chez les Ch'tis",cat:"Film"},
+  {mot:"OSS 117",cat:"Film"},
+  {mot:"Les Visiteurs",cat:"Film"},
+  {mot:"Astérix et Obélix",cat:"Film / BD"},
+  {mot:"Lucky Luke",cat:"BD"},
+  {mot:"Tintin",cat:"BD"},
+  {mot:"Gaston Lagaffe",cat:"BD"},
+  {mot:"Les Schtroumpfs",cat:"BD"},
+  {mot:"Iznogoud",cat:"BD"},
+  {mot:"Le Petit Prince",cat:"Livre"},
+  {mot:"L'Étranger",cat:"Livre"},
+  {mot:"1984",cat:"Livre"},
+  {mot:"Le Seigneur des Anneaux",cat:"Livre / Film"},
+  {mot:"Game of Thrones",cat:"Livre / Série"},
+  {mot:"Dune",cat:"Livre / Film"},
+  {mot:"Hunger Games",cat:"Livre / Film"},
+  {mot:"Twilight",cat:"Livre / Film"},
+  {mot:"Cinquante nuances de Grey",cat:"Livre / Film"},
+  {mot:"Da Vinci Code",cat:"Livre / Film"},
+  {mot:"Sherlock Holmes",cat:"Livre / Série"},
+  {mot:"Don Quichotte",cat:"Livre"},
+  {mot:"Moby Dick",cat:"Livre"},
+  {mot:"Dracula",cat:"Livre / Personnage"},
+  {mot:"Frankenstein",cat:"Livre / Personnage"},
+  {mot:"Ulysse",cat:"Personnage mythologique"},
+  {mot:"Achille",cat:"Personnage mythologique"},
+  {mot:"Zeus",cat:"Personnage mythologique"},
+  {mot:"Athéna",cat:"Personnage mythologique"},
+  {mot:"Cléopâtre",cat:"Histoire"},
+  {mot:"Napoléon",cat:"Histoire"},
+  {mot:"Jeanne d'Arc",cat:"Histoire"},
+  {mot:"Jules César",cat:"Histoire"},
+  {mot:"Alexandre le Grand",cat:"Histoire"},
+  {mot:"Einstein",cat:"Célébrité"},
+  {mot:"Darwin",cat:"Célébrité"},
+  {mot:"Picasso",cat:"Célébrité"},
+  {mot:"Leonardo da Vinci",cat:"Célébrité"},
+  {mot:"Marie Curie",cat:"Célébrité"},
+  {mot:"Bill Gates",cat:"Célébrité"},
+  {mot:"Steve Jobs",cat:"Célébrité"},
+  {mot:"Elon Musk",cat:"Célébrité"},
+  {mot:"Mark Zuckerberg",cat:"Célébrité"},
+  {mot:"Jeff Bezos",cat:"Célébrité"},
+  {mot:"Obama",cat:"Célébrité"},
+  {mot:"Mandela",cat:"Célébrité"},
+  {mot:"Macron",cat:"Célébrité"},
+  {mot:"Brigitte Bardot",cat:"Célébrité"},
+  {mot:"Coluche",cat:"Célébrité"},
+  {mot:"Jacques Chirac",cat:"Célébrité"},
+  {mot:"Zinédine Zidane",cat:"Célébrité"},
+  {mot:"Thierry Henry",cat:"Célébrité"},
+  {mot:"Didier Deschamps",cat:"Célébrité"},
+  {mot:"Tony Parker",cat:"Célébrité"},
+  {mot:"Teddy Riner",cat:"Célébrité"},
+  {mot:"Jo-Wilfried Tsonga",cat:"Célébrité"},
+  {mot:"Amélie Mauresmo",cat:"Célébrité"},
+  {mot:"Ligue des Champions",cat:"Événement"},
+  {mot:"Super Bowl",cat:"Événement"},
+  {mot:"Wimbledon",cat:"Événement"},
+  {mot:"Stade de France",cat:"Lieu"},
+  {mot:"Wembley",cat:"Lieu"},
+  {mot:"Madison Square Garden",cat:"Lieu"},
+  {mot:"Maracana",cat:"Lieu"},
+  {mot:"Camp Nou",cat:"Lieu"},
+  {mot:"San Siro",cat:"Lieu"},
+  {mot:"Old Trafford",cat:"Lieu"},
+  {mot:"Bungee jumping",cat:"Sport extrême"},
+  {mot:"Wingsuit",cat:"Sport extrême"},
+  {mot:"Base jump",cat:"Sport extrême"},
+  {mot:"Skateboard",cat:"Sport"},
+  {mot:"BMX",cat:"Sport"},
+  {mot:"Breakdance",cat:"Danse"},
+  {mot:"Twerk",cat:"Danse"},
+  {mot:"Macarena",cat:"Danse"},
+  {mot:"Harlem Shake",cat:"Phénomène culturel"},
+  {mot:"Ice Bucket Challenge",cat:"Phénomène culturel"},
+  {mot:"Mannequin Challenge",cat:"Phénomène culturel"},
+  {mot:"Gangnam Style",cat:"Chanson"},
+  {mot:"Baby Shark",cat:"Chanson"},
+  {mot:"Despacito",cat:"Chanson"},
+  {mot:"Thriller",cat:"Chanson"},
+  {mot:"Bohemian Rhapsody",cat:"Chanson"},
+  {mot:"Hotel California",cat:"Chanson"},
+  {mot:"Smells Like Teen Spirit",cat:"Chanson"},
+  {mot:"We Will Rock You",cat:"Chanson"},
+  {mot:"Highway to Hell",cat:"Chanson"},
+  {mot:"Back in Black",cat:"Chanson"},
+  {mot:"Stairway to Heaven",cat:"Chanson"},
+  {mot:"Purple Rain",cat:"Chanson"},
+  {mot:"Imagine",cat:"Chanson"},
+  {mot:"Billie Jean",cat:"Chanson"},
+  {mot:"Shape of You",cat:"Chanson"},
+  {mot:"Blinding Lights",cat:"Chanson"},
+  {mot:"Old Town Road",cat:"Chanson"},
+  {mot:"Sicko Mode",cat:"Chanson"},
+  {mot:"Rockstar",cat:"Chanson"},
+  {mot:"See You Again",cat:"Chanson"},
+  {mot:"Uptown Funk",cat:"Chanson"},
+  {mot:"Happy",cat:"Chanson"},
+  {mot:"Roar",cat:"Chanson"},
+  {mot:"Rolling in the Deep",cat:"Chanson"},
+  {mot:"Diamonds",cat:"Chanson"},
+  {mot:"Stay",cat:"Chanson"},
+  {mot:"Levitating",cat:"Chanson"},
+  {mot:"Good 4 U",cat:"Chanson"},
+  {mot:"Drivers License",cat:"Chanson"},
+  {mot:"Watermelon Sugar",cat:"Chanson"},
+  {mot:"Industry Baby",cat:"Chanson"},
+  {mot:"Montero",cat:"Chanson"},
+  {mot:"Kiss Me More",cat:"Chanson"},
+  {mot:"Peaches",cat:"Chanson"},
+  {mot:"Leave the Door Open",cat:"Chanson"},
+  {mot:"Butter",cat:"Chanson"},
+  {mot:"Permission to Dance",cat:"Chanson"},
+  {mot:"Savage Love",cat:"Chanson"},
+  {mot:"Mood",cat:"Chanson"},
+  {mot:"Positions",cat:"Chanson"},
+  {mot:"34+35",cat:"Chanson"},
+  {mot:"Dynamite",cat:"Chanson"},
+  {mot:"Lemon",cat:"Chanson"},
+  {mot:"Bling-Bling",cat:"Expression"},
+  {mot:"YOLO",cat:"Expression"},
+  {mot:"FOMO",cat:"Expression"},
+  {mot:"LOL",cat:"Expression"},
+  {mot:"WTF",cat:"Expression"},
+  {mot:"On est bien",cat:"Expression"},
+  {mot:"Chiller",cat:"Expression"},
+  {mot:"Kiffer",cat:"Verlan / Argot"},
+  {mot:"Laisse béton",cat:"Verlan"},
+  {mot:"Meuf",cat:"Verlan"},
+  {mot:"Chelou",cat:"Verlan"},
+  {mot:"Teuf",cat:"Verlan"},
+  {mot:"Faire la teuf",cat:"Expression"},
+  {mot:"Afterwork",cat:"Activité"},
+  {mot:"Apéro dinatoire",cat:"Repas"},
+  {mot:"Cheese board",cat:"Nourriture"},
+  {mot:"Smash Burger",cat:"Nourriture"},
+  {mot:"Smoothie bowl",cat:"Nourriture"},
+  {mot:"Avocado toast",cat:"Nourriture"},
+  {mot:"Overnight oats",cat:"Nourriture"},
+  {mot:"Food truck",cat:"Concept"},
+  {mot:"Dark kitchen",cat:"Concept"},
+  {mot:"Michelin",cat:"Marque"},
+  {mot:"Gordon Ramsay",cat:"Célébrité"},
+  {mot:"Cyril Lignac",cat:"Célébrité"},
+  {mot:"Thierry Marx",cat:"Célébrité"},
+  {mot:"Masterchef",cat:"Émission"},
+  {mot:"Top Chef",cat:"Émission"},
+  {mot:"The Voice",cat:"Émission"},
+  {mot:"Koh-Lanta",cat:"Émission"},
+  {mot:"N'oubliez pas les paroles",cat:"Émission"},
+  {mot:"Fort Boyard",cat:"Émission"},
+  {mot:"Qui veut gagner des millions",cat:"Émission"},
+  {mot:"Pékin Express",cat:"Émission"},
+  {mot:"L'Amour est dans le pré",cat:"Émission"},
+  {mot:"Secret Story",cat:"Émission"},
+  {mot:"Les Marseillais",cat:"Émission"},
+  {mot:"Loft Story",cat:"Émission"},
+  {mot:"Stade Vélodrome",cat:"Lieu"},
+  {mot:"Parc des Princes",cat:"Lieu"},
+  {mot:"Musée du Louvre",cat:"Lieu"},
+  {mot:"Château de Versailles",cat:"Lieu"},
+  {mot:"Mont-Saint-Michel",cat:"Lieu"},
+  {mot:"Côte d'Azur",cat:"Lieu"},
+  {mot:"Gorges du Verdon",cat:"Lieu"},
+  {mot:"Dune du Pilat",cat:"Lieu"},
+  {mot:"Pont du Gard",cat:"Lieu"},
+  {mot:"Catacombes de Paris",cat:"Lieu"},
+  {mot:"Moulin Rouge",cat:"Lieu"},
+  {mot:"Pigalle",cat:"Lieu"},
+  {mot:"Quartier Latin",cat:"Lieu"},
+  {mot:"La Défense",cat:"Lieu"},
+  {mot:"Saint-Tropez",cat:"Lieu"},
+  {mot:"Monaco",cat:"Lieu"},
+  {mot:"Courchevel",cat:"Lieu"},
+  {mot:"Chamonix",cat:"Lieu"},
+  {mot:"Le Mans",cat:"Lieu / Événement"},
+  {mot:"Circuit de Monaco",cat:"Lieu"},
+  {mot:"Formula 1",cat:"Sport"},
+  {mot:"MotoGP",cat:"Sport"},
+  {mot:"Nascar",cat:"Sport"},
+  {mot:"Rallye Dakar",cat:"Événement"},
+  {mot:"Tour du monde en ballon",cat:"Exploit"},
+  {mot:"Everest",cat:"Nature"},
+  {mot:"K2",cat:"Nature"},
+  {mot:"Grand Canyon",cat:"Nature"},
+  {mot:"Niagara Falls",cat:"Nature"},
+  {mot:"Galápagos",cat:"Lieu"},
+  {mot:"Machu Picchu",cat:"Lieu"},
+  {mot:"Angkor Vat",cat:"Lieu"},
+  {mot:"Petra",cat:"Lieu"},
+  {mot:"Stonehenge",cat:"Lieu"},
+  {mot:"Colisée",cat:"Lieu"},
+  {mot:"Acropole",cat:"Lieu"},
+  {mot:"Sagrada Família",cat:"Lieu"},
+  {mot:"Big Ben",cat:"Lieu"},
+  {mot:"Statue de la Liberté",cat:"Lieu"},
+  {mot:"Mount Rushmore",cat:"Lieu"},
+  {mot:"Golden Gate",cat:"Lieu"},
+  {mot:"Empire State Building",cat:"Lieu"},
+  {mot:"Burj Khalifa",cat:"Lieu"},
+  {mot:"Grande Muraille de Chine",cat:"Lieu"},
+  {mot:"Pyramides de Gizeh",cat:"Lieu"},
+  {mot:"Trocadéro",cat:"Lieu"},
+  {mot:"Place de la Bastille",cat:"Lieu"},
+  {mot:"Arc de Triomphe",cat:"Lieu"},
+];
+
+let teams = [];
+let scores = {};
+let currentTeamIdx = 0;
+let playersSetupIdx = 0;
+let usedWords = new Set();
+let currentWord = null;
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideErr(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+function addTeam() {
+  const inp = document.getElementById('inp-team');
+  const name = inp.value.trim();
+  if (!name) return;
+  if (teams.find(t => t.name.toLowerCase() === name.toLowerCase())) {
+    showErr('err-setup', 'Ce nom existe déjà.');
+    return;
+  }
+  hideErr('err-setup');
+  teams.push({ name, p1: '', p2: '' });
+  inp.value = '';
+  renderTeamsList();
+}
+
+function removeTeam(i) {
+  teams.splice(i, 1);
+  renderTeamsList();
+}
+
+function renderTeamsList() {
+  const el = document.getElementById('teams-list');
+  if (!teams.length) { el.innerHTML = ''; return; }
+  el.innerHTML = teams.map((t, i) => `
+    <div class="card" style="display:flex;align-items:center;gap:10px;padding:0.75rem 1rem">
+      <div style="flex:1">
+        <span style="font-weight:500">${esc(t.name)}</span>
+        ${t.p1 ? `<span style="font-size:13px;color:var(--muted);margin-left:8px">${esc(t.p1)} & ${esc(t.p2)}</span>` : ''}
+      </div>
+      <button onclick="removeTeam(${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:2px 6px;border-radius:8px" aria-label="Supprimer">✕</button>
+    </div>
+  `).join('');
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function startGame() {
+  if (teams.length < 2) { showErr('err-setup', 'Il faut au moins 2 équipes.'); return; }
+  hideErr('err-setup');
+  playersSetupIdx = 0;
+  askPlayers(0);
+}
+
+function askPlayers(i) {
+  playersSetupIdx = i;
+  document.getElementById('players-team-name').textContent = teams[i].name;
+  document.getElementById('inp-p1').value = teams[i].p1 || '';
+  document.getElementById('inp-p2').value = teams[i].p2 || '';
+  hideErr('err-players');
+  show('screen-players');
+  setTimeout(() => document.getElementById('inp-p1').focus(), 100);
+}
+
+function savePlayers() {
+  const p1 = document.getElementById('inp-p1').value.trim();
+  const p2 = document.getElementById('inp-p2').value.trim();
+  if (!p1 || !p2) { showErr('err-players', 'Les deux prénoms sont obligatoires.'); return; }
+  teams[playersSetupIdx].p1 = p1;
+  teams[playersSetupIdx].p2 = p2;
+  if (playersSetupIdx + 1 < teams.length) {
+    askPlayers(playersSetupIdx + 1);
+  } else {
+    initGame();
+  }
+}
+
+function initGame() {
+  teams.forEach(t => scores[t.name] = 0);
+  currentTeamIdx = 0;
+  usedWords.clear();
+  show('screen-game');
+  renderScores();
+  startTurn();
+}
+
+function renderScores() {
+  const row = document.getElementById('scores-row');
+  row.innerHTML = teams.map((t, i) => `
+    <div class="score-chip ${i === currentTeamIdx ? 'active' : ''}">
+      <div class="num">${scores[t.name]}</div>
+      <div class="lbl">${esc(t.name)}</div>
+    </div>
+  `).join('');
+}
+
+function startTurn() {
+  const t = teams[currentTeamIdx];
+  document.getElementById('turn-info').innerHTML =
+    `<strong>${esc(t.name)}</strong> — ${esc(t.p1)} fait deviner à ${esc(t.p2)}`;
+  document.getElementById('phase-guess').style.display = 'block';
+  document.getElementById('phase-result').style.display = 'none';
+  pickWord();
+  renderBuzzGrid();
+}
+
+function pickWord() {
+  const available = WORDS.filter(w => !usedWords.has(w.mot));
+  if (!available.length) usedWords.clear();
+  const pool = WORDS.filter(w => !usedWords.has(w.mot));
+  const w = pool[Math.floor(Math.random() * pool.length)];
+  currentWord = w;
+  usedWords.add(w.mot);
+  document.getElementById('word-main').textContent = w.mot;
+  document.getElementById('word-cat').innerHTML = `<span class="badge badge-category">${w.cat}</span>`;
+}
+
+function renderBuzzGrid() {
+  const grid = document.getElementById('buzz-grid');
+  grid.innerHTML = teams.map((t, i) => `
+    <button class="buzz-btn ${i === currentTeamIdx ? 'is-active' : ''}" onclick="teamGuessed(${i})">
+      <div class="bname">${esc(t.name)}</div>
+      <div class="bplayers">${esc(t.p1)} & ${esc(t.p2)}</div>
+    </button>
+  `).join('');
+}
+
+function teamGuessed(idx) {
+  const active = teams[currentTeamIdx];
+  const guesser = teams[idx];
+  let emoji, msg;
+  if (idx === currentTeamIdx) {
+    scores[active.name]++;
+    emoji = '🎉';
+    msg = `<strong>${esc(active.name)}</strong> marque 1 point !`;
+  } else {
+    scores[guesser.name]++;
+    emoji = '⚡';
+    msg = `<strong>${esc(guesser.name)}</strong> vole le point !`;
+  }
+  document.getElementById('phase-guess').style.display = 'none';
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-msg').innerHTML = msg;
+  document.getElementById('phase-result').style.display = 'block';
+  renderScores();
+}
+
+function skipWord() {
+  pickWord();
+}
+
+function nextTurn() {
+  currentTeamIdx = (currentTeamIdx + 1) % teams.length;
+  renderScores();
+  startTurn();
+}
+
+document.getElementById('inp-team').addEventListener('keydown', e => { if (e.key === 'Enter') addTeam(); });
+document.getElementById('inp-p1').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-p2').focus(); });
+document.getElementById('inp-p2').addEventListener('keydown', e => { if (e.key === 'Enter') savePlayers(); });
+</script>
+</body>
+</html>
