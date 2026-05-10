@@ -6,6 +6,12 @@ Un jeu de société pour soirées entre amis, jouable directement dans le naviga
 
 ---
 
+## Origine
+ 
+Ce projet est **fortement inspiré — pour ne pas dire pompé** — du *Jeu de la Complicité*, segment culte du podcast **[Un Bon Moment](https://www.youtube.com/@kyankhojandi)** de **Kyan Khojandi** et **Navo**.
+ 
+Je l'ai recréé sous forme de web app pour pouvoir y jouer avec mes amis. Tout le crédit du concept revient à eux — allez écouter le podcast, c'est magnifique.
+
 ## C'est quoi ?
 
 Le jeu de la complicité se joue en équipes de 2. Un joueur doit faire deviner un mot à son partenaire uniquement via des anecdotes et expériences communes — pas d'indices classiques, juste la complicité.
